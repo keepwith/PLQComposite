@@ -13,9 +13,10 @@ class PLQLoss(object):
         self.quad_coef = quad_coef
         self.n_pieces = len(self.cutpoints) - 1
         self.min_val = np.inf
-        print(self.cutpoints)
-        print(self.quad_coef)
-        print(self.n_pieces)
+        self.min_knot = np.inf
+        # print(self.cutpoints)
+        # print(self.quad_coef)
+        # print(self.n_pieces)
 
     def __call__(self, x):
         """ Evaluation of PQLoss
@@ -35,6 +36,22 @@ class PLQLoss(object):
                           self.quad_coef['c'][i]
         return y
 
+    def check_cutoff(self):
+        """
+            check whether there exists a cutoff between the knots
+        :return:
+        """
+        # check the cutoff of each piece
+        for i in range(self.n_pieces - 1):
+            if self.quad_coef['a'][i] != 0:  # if the quadratic term is not zero
+                cutpoint = -self.quad_coef['b'][i] / (2 * self.quad_coef['a'][i])
+                if self.cutpoints[i] < cutpoint < self.cutpoints[i + 1]:  # if the cutoff is between the knots
+                    # add the cutoff to the knot list and update the coefficients
+                    self.cutpoints.add(cutpoint, i)
+                    self.quad_coef['a'].add(self.quad_coef['a'][i], i)
+                    self.quad_coef['b'].add(self.quad_coef['b'][i], i)
+                    self.quad_coef['c'].add(self.quad_coef['c'][i], i)
+
     def is_continuous(self):
         """
             check whether the input PLQ function is continuous
@@ -51,11 +68,15 @@ class PLQLoss(object):
 
     def find_min(self):
         """
-            find the minimum of the PLQ function, if it is not on the knots, add it to the knot list
+            find the minimum knots and value of the PLQ function
         :return:
         """
-        # not the right version if the min value is between the knots
-        return self.min_val
+        # find the minimum value and knot
+        out_cut = self(self.cutpoints)
+        self.min_val = min(out_cut)
+        self.min_knot = self.cutpoints[np.argmin(out_cut)]
+        # remove self.min_val from the PLQ function
+        self.quad_coef['c'] -= self.min_val
 
     def is_convex(self):
         """
@@ -96,16 +117,17 @@ class PLQLoss(object):
         cutpoints = self.cutpoints.copy()
         cutpoints = cutpoints[1:-1]
 
-        # evaluate cutpoints
-        out_cut = self(cutpoints)
-        # move the loss function to the x-axis;
-        if min(out_cut) > 0:
-            self.min_val = min(out_cut)
-            quad_coef['c'] -= self.min_val
-            out_cut -= self.min_val
+        # # evaluate cutpoints
+        # out_cut = self(cutpoints)
+        # # move the loss function to the x-axis;
+        # if min(out_cut) > 0:
+        #     self.min_val = min(out_cut)
+        #     quad_coef['c'] -= self.min_val
+        #     out_cut -= self.min_val
 
         # remove a ReLU/ReHU function from this point; i-th point -> i-th or (i+1)-th interval
-        ind_tmp = np.argmax(out_cut == 0.)
+        # ind_tmp = np.argmax(out_cut == 0.)
+        ind_tmp = self.min_knot
 
         # Right
         # first interval on the right
@@ -163,4 +185,3 @@ class PLQLoss(object):
 
         return ReHLoss(np.array(relu_coef), np.array(relu_intercept), np.array(rehu_coef), np.array(rehu_intercept),
                        np.array(rehu_cut))
-
