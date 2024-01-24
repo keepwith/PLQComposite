@@ -13,7 +13,7 @@ class ReHLoss(object):
     """
 
     def __init__(self, relu_coef, relu_intercept,
-                 rehu_coef=np.empty(shape=(0, 0)), rehu_intercept=np.empty(shape=(0, 0)), rehu_cut=1):
+        rehu_coef=np.empty(shape=(0, 0)), rehu_intercept=np.empty(shape=(0, 0)), rehu_cut=1):
         self.relu_coef = relu_coef
         self.relu_intercept = relu_intercept
         self.rehu_cut = rehu_cut * np.ones_like(rehu_coef)
@@ -21,7 +21,7 @@ class ReHLoss(object):
         self.rehu_intercept = rehu_intercept
         self.H = rehu_coef.shape[0]
         self.L = relu_coef.shape[0]
-        self.n = relu_coef.shape[1]
+        # self.n = relu_coef.shape[1]
 
     def __call__(self, x):
         """Evaluate ReHLoss given a data matrix

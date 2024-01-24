@@ -7,7 +7,8 @@ from src.PLQLoss import PLQLoss
 
 class PLQTestCase(unittest.TestCase):
     def setUp(self):
-        self.PLQLoss = PLQLoss(cutpoints=np.array([0]), quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([0, 0])})
+        self.PLQLoss = PLQLoss(cutpoints=np.array([0]),
+                               quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([0, 0])})
 
     def test_continuous(self):
         self.assertEqual(self.PLQLoss.is_continuous(), True)
@@ -15,5 +16,6 @@ class PLQTestCase(unittest.TestCase):
     def test_convex(self):
         self.assertEqual(self.PLQLoss.is_convex(), True)
 
-    # def test_2ReHLoss(self):
-    #     self.assertEqual(self.PLQLoss._2ReHLoss(), )
+# PLQLoss = PLQLoss(cutpoints=np.array([0]), quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([0., 0.])})
+# print(PLQLoss._2ReHLoss().relu_coef)
+# print(PLQLoss._2ReHLoss().relu_intercept)

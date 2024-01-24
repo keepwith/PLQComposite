@@ -8,15 +8,24 @@ class PLQLoss(object):
         Piecewise Linear Quadratic Loss function
     """
 
-    def __init__(self, cutpoints, quad_coef):
-        self.cutpoints = np.concatenate(([-np.inf], cutpoints, [np.inf]))
-        self.quad_coef = quad_coef
-        self.n_pieces = len(self.cutpoints) - 1
-        self.min_val = np.inf
-        self.min_knot = np.inf
-        # print(self.cutpoints)
-        # print(self.quad_coef)
-        # print(self.n_pieces)
+    def __init__(self, quad_coef, type="plq", **paras):
+        # minimax form input
+        if type == "minimax":
+            self.quad_coef, self.cutpoints, self.n_pieces = self.minimax2plq(quad_coef)
+            self.min_val = np.inf
+            self.min_knot = np.inf
+        # PLQ form input
+        elif type == 'plq':
+            # check whether the cutpoints are given
+            if 'cutpoints' not in paras.keys():
+                print("The `cutpoints` is not given!")
+                exit()
+            else:
+                self.cutpoints = np.concatenate(([-np.inf], paras['cutpoints'], [np.inf]))
+            self.quad_coef = quad_coef
+            self.n_pieces = len(self.cutpoints) - 1
+            self.min_val = np.inf
+            self.min_knot = np.inf
 
     def __call__(self, x):
         """ Evaluation of PQLoss
@@ -28,13 +37,15 @@ class PLQLoss(object):
         assert len(self.quad_coef['a']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
         assert len(self.quad_coef['b']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
         assert len(self.quad_coef['c']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
-
         y = np.zeros_like(x)
         for i in range(self.n_pieces):
-            cond_tmp = (x > self.cutpoints[i] & x <= self.cutpoints[i + 1])
+            cond_tmp = (x > self.cutpoints[i]) & (x <= self.cutpoints[i + 1])
             y[cond_tmp] = self.quad_coef['a'][i] * x[cond_tmp] ** 2 + self.quad_coef['b'][i] * x[cond_tmp] + \
                           self.quad_coef['c'][i]
         return y
+
+    def minimax2plq(self, quad_coef):
+        return quad_coef, np.array([0]), 1
 
     def check_cutoff(self):
         """
@@ -72,9 +83,10 @@ class PLQLoss(object):
         :return:
         """
         # find the minimum value and knot
-        out_cut = self(self.cutpoints)
+        print(self.cutpoints[1:-1])
+        out_cut = self(self.cutpoints[1:-1])
         self.min_val = min(out_cut)
-        self.min_knot = self.cutpoints[np.argmin(out_cut)]
+        self.min_knot = np.argmin(out_cut) + 1
         # remove self.min_val from the PLQ function
         self.quad_coef['c'] -= self.min_val
 
@@ -111,22 +123,15 @@ class PLQLoss(object):
             print("The PLQ function is not convex!")
             exit()
 
+        # find the minimum value and knot
+        self.find_min()
+
         relu_coef, relu_intercept = [], []
         rehu_coef, rehu_intercept, rehu_cut = [], [], []
         quad_coef = self.quad_coef.copy()
         cutpoints = self.cutpoints.copy()
-        cutpoints = cutpoints[1:-1]
-
-        # # evaluate cutpoints
-        # out_cut = self(cutpoints)
-        # # move the loss function to the x-axis;
-        # if min(out_cut) > 0:
-        #     self.min_val = min(out_cut)
-        #     quad_coef['c'] -= self.min_val
-        #     out_cut -= self.min_val
 
         # remove a ReLU/ReHU function from this point; i-th point -> i-th or (i+1)-th interval
-        # ind_tmp = np.argmax(out_cut == 0.)
         ind_tmp = self.min_knot
 
         # Right
@@ -159,7 +164,7 @@ class PLQLoss(object):
         # Left
         # first interval on the left
         # + relu
-        temp = -2 * quad_coef['a'][ind_tmp - 1] * cutpoints[ind_tmp] - quad_coef['b'][ind_tmp - 1]
+        temp = 2 * quad_coef['a'][ind_tmp - 1] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp - 1]
         relu_coef.append(temp)
         relu_intercept.append(-temp * cutpoints[ind_tmp])
 
