@@ -14,6 +14,7 @@ class PLQLoss(object):
             self.quad_coef, self.cutpoints, self.n_pieces = self.minimax2plq(quad_coef)
             self.min_val = np.inf
             self.min_knot = np.inf
+
         # PLQ form input
         elif type == 'plq':
             # check whether the cutpoints are given
@@ -34,15 +35,22 @@ class PLQLoss(object):
         """
 
         x = np.array(x)
+        # check the size of coefficients
         assert len(self.quad_coef['a']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
         assert len(self.quad_coef['b']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
         assert len(self.quad_coef['c']) == self.n_pieces, "`cutpoints` and `quad_coef` are mismatched."
+
         y = np.zeros_like(x)
         for i in range(self.n_pieces):
             cond_tmp = (x > self.cutpoints[i]) & (x <= self.cutpoints[i + 1])
             y[cond_tmp] = self.quad_coef['a'][i] * x[cond_tmp] ** 2 + self.quad_coef['b'][i] * x[cond_tmp] + \
                           self.quad_coef['c'][i]
-        return y
+
+        # add back the minimum value
+        if self.min_val != np.inf:
+            return y + self.min_val
+        else:
+            return y
 
     def minimax2plq(self, quad_coef):
         return quad_coef, np.array([0]), 1
@@ -54,7 +62,7 @@ class PLQLoss(object):
         """
         # check the cutoff of each piece
         for i in range(self.n_pieces - 1):
-            if self.quad_coef['a'][i] != 0:  # if the quadratic term is not zero
+            if self.quad_coef['a'][i] != 0:  # only will happen when the quadratic term is not zero
                 cutpoint = -self.quad_coef['b'][i] / (2 * self.quad_coef['a'][i])
                 if self.cutpoints[i] < cutpoint < self.cutpoints[i + 1]:  # if the cutoff is between the knots
                     # add the cutoff to the knot list and update the coefficients
@@ -68,7 +76,7 @@ class PLQLoss(object):
             check whether the input PLQ function is continuous
         :return: True or False
         """
-        # check the continuity at cut points
+        # check the continuity at cut points from left to right
         for i in range(self.n_pieces - 1):
             if self.quad_coef['a'][i] * self.cutpoints[i + 1] ** 2 + self.quad_coef['b'][i] * self.cutpoints[i + 1] + \
                     self.quad_coef['c'][i] != self.quad_coef['a'][i + 1] * self.cutpoints[i + 1] ** 2 + \
@@ -83,12 +91,11 @@ class PLQLoss(object):
         :return:
         """
         # find the minimum value and knot
-        print(self.cutpoints[1:-1])
         out_cut = self(self.cutpoints[1:-1])
         self.min_val = min(out_cut)
         self.min_knot = np.argmin(out_cut) + 1
         # remove self.min_val from the PLQ function
-        self.quad_coef['c'] -= self.min_val
+        self.quad_coef['c'] = self.quad_coef['c'] + (-self.min_val)
 
     def is_convex(self):
         """
