@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.ReHLoss import ReHLoss
+from plqcom.ReHLoss import ReHLoss
 
 
 class PLQLoss(object):
@@ -54,65 +54,6 @@ class PLQLoss(object):
 
     def minimax2plq(self, quad_coef):
         return quad_coef, np.array([0]), 1
-
-    def check_cutoff(self):
-        """
-            check whether there exists a cutoff between the knots
-        :return:
-        """
-        # check the cutoff of each piece
-        for i in range(self.n_pieces - 1):
-            if self.quad_coef['a'][i] != 0:  # only will happen when the quadratic term is not zero
-                cutpoint = -self.quad_coef['b'][i] / (2 * self.quad_coef['a'][i])
-                if self.cutpoints[i] < cutpoint < self.cutpoints[i + 1]:  # if the cutoff is between the knots
-                    # add the cutoff to the knot list and update the coefficients
-                    self.cutpoints.add(cutpoint, i)
-                    self.quad_coef['a'].add(self.quad_coef['a'][i], i)
-                    self.quad_coef['b'].add(self.quad_coef['b'][i], i)
-                    self.quad_coef['c'].add(self.quad_coef['c'][i], i)
-
-    def is_continuous(self):
-        """
-            check whether the input PLQ function is continuous
-        :return: True or False
-        """
-        # check the continuity at cut points from left to right
-        for i in range(self.n_pieces - 1):
-            if self.quad_coef['a'][i] * self.cutpoints[i + 1] ** 2 + self.quad_coef['b'][i] * self.cutpoints[i + 1] + \
-                    self.quad_coef['c'][i] != self.quad_coef['a'][i + 1] * self.cutpoints[i + 1] ** 2 + \
-                    self.quad_coef['b'][i + 1] * self.cutpoints[i + 1] + self.quad_coef['c'][i + 1]:
-                return False
-
-        return True
-
-    def find_min(self):
-        """
-            find the minimum knots and value of the PLQ function
-        :return:
-        """
-        # find the minimum value and knot
-        out_cut = self(self.cutpoints[1:-1])
-        self.min_val = min(out_cut)
-        self.min_knot = np.argmin(out_cut) + 1
-        # remove self.min_val from the PLQ function
-        self.quad_coef['c'] = self.quad_coef['c'] + (-self.min_val)
-
-    def is_convex(self):
-        """
-            check whether the input PLQ function is convex
-        ":return: True or False
-        """
-        # check the second order derivatives
-        if min(self.quad_coef['a']) < 0:
-            return False
-
-        # compare the first order derivatives at cut points
-        for i in range(self.n_pieces - 1):
-            if 2 * self.quad_coef['a'][i] * self.cutpoints[i + 1] + self.quad_coef['b'][i] > \
-                    2 * self.quad_coef['a'][i + 1] * self.cutpoints[i + 1] + self.quad_coef['b'][i + 1]:
-                return False
-
-        return True
 
     def _2ReHLoss(self):
         """

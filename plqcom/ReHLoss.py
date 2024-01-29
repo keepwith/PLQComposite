@@ -1,5 +1,5 @@
 import numpy as np
-from src._base import relu, rehu
+from plqcom.base import relu, rehu
 
 
 class ReHLoss(object):

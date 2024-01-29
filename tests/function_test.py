@@ -1,10 +1,10 @@
-import unittest
-
+import pytest
 import numpy as np
 
-from src.PLQLoss import PLQLoss
+from plqcom.PLQLoss import PLQLoss
 
-class PLQTestCase(unittest.TestCase):
+
+class Test_PLQLoss():
     def setUp(self):
         self.PLQLoss = PLQLoss(cutpoints=np.array([0]),
                                quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([0, 0])})
