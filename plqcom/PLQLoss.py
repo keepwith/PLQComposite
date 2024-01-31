@@ -178,7 +178,7 @@ class PLQLoss(object):
 
         if quad_coef['a'][ind_tmp] != 0:
             # +rehu
-            rehu_coef.append(np.sqrt(-2 * quad_coef['a'][ind_tmp - 1]))
+            rehu_coef.append(-np.sqrt(2 * quad_coef['a'][ind_tmp - 1]))
             rehu_intercept.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * cutpoints[ind_tmp])
             rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * (cutpoints[ind_tmp] - cutpoints[ind_tmp - 1]))
 

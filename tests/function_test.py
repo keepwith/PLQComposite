@@ -34,6 +34,7 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
         # self.assertEqual(self.PLQLoss._2ReHLoss(), None)
+
         plqloss = PLQLoss(cutpoints=np.array([]),
                           quad_coef={'a': np.array([1]), 'b': np.array([0]), 'c': np.array([0])})
         rehloss = plqloss._2ReHLoss()
@@ -42,6 +43,7 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_coef)
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
+
 
 # PLQLoss = PLQLoss(cutpoints=np.array([0]),
 #                   quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
