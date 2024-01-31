@@ -1,5 +1,5 @@
 import numpy as np
-from plqutils import PLQProperty
+from plqcom.plqutils import PLQProperty
 from plqcom.ReHLoss import ReHLoss
 from sympy import symbols, solve, Eq
 
