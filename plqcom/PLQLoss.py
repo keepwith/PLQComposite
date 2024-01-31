@@ -98,11 +98,12 @@ class PLQLoss(object):
             i = 0
             while i < len(new_quad_coef['a']) - 1:
                 if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and new_quad_coef['b'][i] == new_quad_coef['b'][
-                        i + 1] and new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
+                    i + 1] and new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
                     new_quad_coef['a'] = np.delete(new_quad_coef['a'], i + 1)
                     new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
                     new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
                     cutpoints = np.delete(cutpoints, i)
+                i += 1
 
             new_cutpoints = cutpoints
             new_n_pieces = len(new_quad_coef['a'])
@@ -124,6 +125,9 @@ class PLQLoss(object):
             print("The PLQ function is not convex!")
             exit()
 
+        # check the cutoff of each piece
+        PLQProperty.check_cutoff(self)
+
         # find the minimum value and knot
         PLQProperty.find_min(self)
 
@@ -139,8 +143,9 @@ class PLQLoss(object):
         # first interval on the right
         # + relu
         temp = 2 * quad_coef['a'][ind_tmp] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp]
-        relu_coef.append(temp)
-        relu_intercept.append(-temp * cutpoints[ind_tmp])
+        if temp != 0:
+            relu_coef.append(temp)
+            relu_intercept.append(-temp * cutpoints[ind_tmp])
 
         if quad_coef['a'][ind_tmp] != 0:
             # +rehu
@@ -153,8 +158,9 @@ class PLQLoss(object):
             # +relu
             temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i - 1]) * cutpoints[i] + (
                     quad_coef['b'][i] - quad_coef['b'][i - 1])
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[i])
+            if temp != 0:
+                relu_coef.append(temp)
+                relu_intercept.append(-temp * cutpoints[i])
 
             if quad_coef['a'][i] != 0:
                 # +rehu
@@ -166,8 +172,9 @@ class PLQLoss(object):
         # first interval on the left
         # + relu
         temp = 2 * quad_coef['a'][ind_tmp - 1] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp - 1]
-        relu_coef.append(temp)
-        relu_intercept.append(-temp * cutpoints[ind_tmp])
+        if temp != 0:
+            relu_coef.append(temp)
+            relu_intercept.append(-temp * cutpoints[ind_tmp])
 
         if quad_coef['a'][ind_tmp] != 0:
             # +rehu
@@ -180,8 +187,9 @@ class PLQLoss(object):
             # +relu
             temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i + 1]) * cutpoints[i + 1] + (
                     quad_coef['b'][i] - quad_coef['b'][i + 1])
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[i + 1])
+            if temp != 0:
+                relu_coef.append(temp)
+                relu_intercept.append(-temp * cutpoints[i + 1])
 
             if quad_coef['a'][i] != 0:
                 # +rehu
