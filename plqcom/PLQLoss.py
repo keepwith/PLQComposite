@@ -35,7 +35,7 @@ class PLQLoss(object):
             else:
                 self.cutpoints = np.concatenate(([-np.inf], paras['cutpoints'], [np.inf]))
             self.quad_coef = quad_coef
-            self.n_pieces = len(self.cutpoints) - 1
+            self.n_pieces = len(self.quad_coef['a'])
             self.min_val = np.inf
             self.min_knot = np.inf
 
@@ -154,7 +154,7 @@ class PLQLoss(object):
             rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp]) * (cutpoints[ind_tmp + 1] - cutpoints[ind_tmp]))
 
         # other intervals on the right
-        for i in range(ind_tmp + 1, len(cutpoints) - 1):
+        for i in range(ind_tmp + 1, len(cutpoints) - 2):
             # +relu
             temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i - 1]) * cutpoints[i] + (
                     quad_coef['b'][i] - quad_coef['b'][i - 1])

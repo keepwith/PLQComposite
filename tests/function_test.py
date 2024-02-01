@@ -27,6 +27,7 @@ class Test_PLQLoss(unittest.TestCase):
         self.assertEqual(self.PLQLoss.min_val, 1)
 
     def test_2ReHLoss(self):
+        print("test 0")
         rehloss = self.PLQLoss._2ReHLoss()
         print(rehloss.relu_coef)
         print(rehloss.relu_intercept)
@@ -35,6 +36,8 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_cut)
         # self.assertEqual(self.PLQLoss._2ReHLoss(), None)
 
+        # y = x^2
+        print("test 1")
         plqloss = PLQLoss(cutpoints=np.array([]),
                           quad_coef={'a': np.array([1]), 'b': np.array([0]), 'c': np.array([0])})
         rehloss = plqloss._2ReHLoss()
@@ -44,20 +47,14 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
 
-
-# PLQLoss = PLQLoss(cutpoints=np.array([0]),
-#                   quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
-# print(PLQLoss._2ReHLoss().relu_coef)
-# print(PLQLoss._2ReHLoss().relu_intercept)
-
-
-# self.assertCountEqual(self.result, self.expected)
-
-# from collections import Counter
-#
-# def check_equal_without_sort(arr1, arr2):
-#     return Counter(arr1) == Counter(arr2)
-#
-# arr1 = [3,4,5]
-# arr2 = [5,3,4]
-# print(check_equal_without_sort(arr1,arr2))
+        #
+        print("test 2")
+        plqloss = PLQLoss(cutpoints=np.array([0, 1, 2, 3, 4]),
+                          quad_coef={'a': np.array([0, 0, 0, 0, 0]), 'b': np.array([0, 1, 2, 3, 4]),
+                                     'c': np.array([0, 0, -1, -3, -6])})
+        rehloss = plqloss._2ReHLoss()
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)

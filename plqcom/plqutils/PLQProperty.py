@@ -6,12 +6,16 @@ def is_continuous(plq_loss):
         check whether the input PLQ function is continuous
     :return: True or False
     """
+    cutpoints = plq_loss.cutpoints[1:-1].copy()
+    quad_coef = plq_loss.quad_coef.copy()
+    n_pieces = plq_loss.n_pieces
+
     # check the continuity at cut points from left to right
-    for i in range(plq_loss.n_pieces - 1):
-        if (plq_loss.quad_coef['a'][i] * plq_loss.cutpoints[i + 1] ** 2 + plq_loss.quad_coef['b'][i] *
-                plq_loss.cutpoints[i + 1] + plq_loss.quad_coef['c'][i] != plq_loss.quad_coef['a'][i + 1] *
-                plq_loss.cutpoints[i + 1] ** 2 + plq_loss.quad_coef['b'][i + 1] * plq_loss.cutpoints[i + 1] +
-                plq_loss.quad_coef['c'][i + 1]):
+    for i in range(n_pieces - 2):
+        if (quad_coef['a'][i] * cutpoints[i] ** 2 + quad_coef['b'][i] *
+                cutpoints[i] + quad_coef['c'][i] != quad_coef['a'][i + 1] *
+                cutpoints[i] ** 2 + quad_coef['b'][i + 1] * cutpoints[i] +
+                quad_coef['c'][i + 1]):
             return False
 
     return True
