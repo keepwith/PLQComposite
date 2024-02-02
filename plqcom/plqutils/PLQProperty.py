@@ -11,7 +11,7 @@ def is_continuous(plq_loss):
     n_pieces = plq_loss.n_pieces
 
     # check the continuity at cut points from left to right
-    for i in range(n_pieces - 2):
+    for i in range(n_pieces - 1):
         if (quad_coef['a'][i] * cutpoints[i] ** 2 + quad_coef['b'][i] *
                 cutpoints[i] + quad_coef['c'][i] != quad_coef['a'][i + 1] *
                 cutpoints[i] ** 2 + quad_coef['b'][i + 1] * cutpoints[i] +

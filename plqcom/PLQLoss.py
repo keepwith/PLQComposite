@@ -23,6 +23,7 @@ class PLQLoss(object):
         # minimax form input
         if type == "minimax":
             self.quad_coef, self.cutpoints, self.n_pieces = self.minimax2plq(quad_coef)
+            self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
             self.min_val = np.inf
             self.min_knot = np.inf
 
@@ -31,6 +32,9 @@ class PLQLoss(object):
             # check whether the cutpoints are given
             if 'cutpoints' not in paras.keys():
                 print("The `cutpoints` is not given!")
+                exit()
+            elif len(paras['cutpoints']) != (len(quad_coef['a']) - 1):
+                print("The size of cutpoints and quad_coef is not matched!")
                 exit()
             else:
                 self.cutpoints = np.concatenate(([-np.inf], paras['cutpoints'], [np.inf]))
@@ -86,10 +90,10 @@ class PLQLoss(object):
             new_n_pieces = 1
         else:
             evals = (cutpoints[:-1] + cutpoints[1:]) / 2
-            evals = np.concatenate(([-1 + cutpoints[0]], evals, 1 + cutpoints[-1]))
+            evals = np.concatenate(([-1 + cutpoints[0]], evals, [1 + cutpoints[-1]]))
             new_quad_coef = {'a': np.array([]), 'b': np.array([]), 'c': np.array([])}
-            for i in range(len(evals) - 1):
-                ind_tmp = np.argmin(quad_coef['a'] * evals[i] ** 2 + quad_coef['b'] * evals[i] + quad_coef['c'])
+            for i in range(len(evals)):
+                ind_tmp = np.argmax(quad_coef['a'] * evals[i] ** 2 + quad_coef['b'] * evals[i] + quad_coef['c'])
                 new_quad_coef['a'] = np.append(new_quad_coef['a'], quad_coef['a'][ind_tmp])
                 new_quad_coef['b'] = np.append(new_quad_coef['b'], quad_coef['b'][ind_tmp])
                 new_quad_coef['c'] = np.append(new_quad_coef['c'], quad_coef['c'][ind_tmp])
@@ -103,7 +107,8 @@ class PLQLoss(object):
                     new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
                     new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
                     cutpoints = np.delete(cutpoints, i)
-                i += 1
+                else:
+                    i += 1
 
             new_cutpoints = cutpoints
             new_n_pieces = len(new_quad_coef['a'])
@@ -138,7 +143,7 @@ class PLQLoss(object):
 
         # remove a ReLU/ReHU function from this point; i-th point -> i-th or (i+1)-th interval
         ind_tmp = self.min_knot
-
+        print(ind_tmp)
         # Right
         # first interval on the right
         # + relu
@@ -154,7 +159,7 @@ class PLQLoss(object):
             rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp]) * (cutpoints[ind_tmp + 1] - cutpoints[ind_tmp]))
 
         # other intervals on the right
-        for i in range(ind_tmp + 1, len(cutpoints) - 2):
+        for i in range(ind_tmp + 1, len(cutpoints) - 1):
             # +relu
             temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i - 1]) * cutpoints[i] + (
                     quad_coef['b'][i] - quad_coef['b'][i - 1])
