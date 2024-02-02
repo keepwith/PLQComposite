@@ -80,7 +80,7 @@ class PLQLoss(object):
                                       quad_coef['a'][j] * x ** 2 + quad_coef['b'][j] * x + quad_coef['c'][j]), x)
 
         solutions = list(set(solutions))  # remove the duplicate solutions
-        cutpoints = np.sort(np.array(solutions))
+        cutpoints = np.sort(np.array(solutions, dtype=float))
 
         if len(cutpoints) == 0:
             ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x=0
@@ -143,7 +143,7 @@ class PLQLoss(object):
 
         # remove a ReLU/ReHU function from this point; i-th point -> i-th or (i+1)-th interval
         ind_tmp = self.min_knot
-        print(ind_tmp)
+
         # Right
         # first interval on the right
         # + relu
@@ -181,7 +181,7 @@ class PLQLoss(object):
             relu_coef.append(temp)
             relu_intercept.append(-temp * cutpoints[ind_tmp])
 
-        if quad_coef['a'][ind_tmp] != 0:
+        if quad_coef['a'][ind_tmp - 1] != 0:
             # +rehu
             rehu_coef.append(-np.sqrt(2 * quad_coef['a'][ind_tmp - 1]))
             rehu_intercept.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * cutpoints[ind_tmp])

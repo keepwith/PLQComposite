@@ -12,10 +12,10 @@ def is_continuous(plq_loss):
 
     # check the continuity at cut points from left to right
     for i in range(n_pieces - 1):
-        if (quad_coef['a'][i] * cutpoints[i] ** 2 + quad_coef['b'][i] *
-                cutpoints[i] + quad_coef['c'][i] != quad_coef['a'][i + 1] *
-                cutpoints[i] ** 2 + quad_coef['b'][i + 1] * cutpoints[i] +
-                quad_coef['c'][i + 1]):
+        if (quad_coef['a'][i] * (cutpoints[i] ** 2) + quad_coef['b'][i] *
+            cutpoints[i] + quad_coef['c'][i]) - (quad_coef['a'][i + 1] *
+                                                 (cutpoints[i] ** 2) + quad_coef['b'][i + 1] * cutpoints[i] +
+                                                 quad_coef['c'][i + 1]) > 1e-6:
             return False
 
     return True
@@ -44,32 +44,25 @@ def check_cutoff(plq_loss):
         check whether there exists a cutoff between the knots
     :return:
     """
-    cutpoints = plq_loss.cutpoints[1:-1].copy()
+    cutpoints = plq_loss.cutpoints.copy()
     quad_coef = plq_loss.quad_coef.copy()
     n_pieces = plq_loss.n_pieces
 
     # check the cutoff of each piece
-    if n_pieces == 1:
-        if quad_coef['a'][0] != 0:
-            middlepoint = -quad_coef['b'][0] / (2 * quad_coef['a'][0])
-            cutpoints = np.insert(cutpoints, 0, middlepoint)
-            quad_coef['a'] = np.insert(quad_coef['a'], 0, quad_coef['a'][0])
-            quad_coef['b'] = np.insert(quad_coef['b'], 0, quad_coef['b'][0])
-            quad_coef['c'] = np.insert(quad_coef['c'], 0, quad_coef['c'][0])
-    else:
-        i = 0
-        while i < len(quad_coef['a']) - 1:
-            if quad_coef['a'][i] != 0:  # only will happen when the quadratic term is not zero
-                middlepoint = -quad_coef['b'][i] / (2 * quad_coef['a'][i])
-                if cutpoints[i] < cutpoints < cutpoints[i + 1]:  # if the cutoff is between the knots
-                    # add the cutoff to the knot list and update the coefficients
-                    cutpoints = np.insert(cutpoints, i, middlepoint)
-                    quad_coef['a'] = np.insert(quad_coef['a'], i, quad_coef['a'][i])
-                    quad_coef['b'] = np.insert(quad_coef['b'], i, quad_coef['b'][i])
-                    quad_coef['c'] = np.insert(quad_coef['c'], i, quad_coef['c'][i])
-            i += 1
+    i = 0
 
-    plq_loss.cutpoints = np.concatenate(([-np.inf], cutpoints, [np.inf]))
+    while i < len(quad_coef['a']):
+        if quad_coef['a'][i] != 0:  # only will happen when the quadratic term is not zero
+            middlepoint = -quad_coef['b'][i] / (2 * quad_coef['a'][i])
+            if cutpoints[i] < middlepoint < cutpoints[i + 1]:  # if the cutoff is between the knots
+                # add the cutoff to the knot list and update the coefficients
+                cutpoints = np.insert(cutpoints, i + 1, middlepoint)
+                quad_coef['a'] = np.insert(quad_coef['a'], i + 1, quad_coef['a'][i])
+                quad_coef['b'] = np.insert(quad_coef['b'], i + 1, quad_coef['b'][i])
+                quad_coef['c'] = np.insert(quad_coef['c'], i + 1, quad_coef['c'][i])
+        i += 1
+
+    plq_loss.cutpoints = cutpoints
     plq_loss.quad_coef = quad_coef
     plq_loss.n_pieces = len(quad_coef['a'])
 
