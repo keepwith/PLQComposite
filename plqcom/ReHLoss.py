@@ -1,3 +1,10 @@
+""" ReHLoss: Definition of ReHLoss class """
+
+# Author: Ben Dai <bendai@cuhk.edu.hk>
+#         Yixuan Qiu <qiuyixuan@sufe.edu.cn>
+
+# License: MIT License
+
 import numpy as np
 from plqcom.base import relu, rehu
 
@@ -9,7 +16,36 @@ class ReHLoss(object):
     Parameters
     ----------
 
+    relu_coef : {array-like} of shape (n_relu, n_samples)
+        ReLU coeff matrix, where `n_loss` is the number of losses and
+        `n_relu` is the number of relus.
 
+    relu_intercept : {array-like} of shape (n_relu, n_samples)
+        ReLU intercept matrix, where `n_loss` is the number of losses and
+        `n_relu` is the number of relus.
+
+    rehu_coef : {array-like} of shape (n_rehu, n_samples)
+        ReHU coeff matrix, where `n_loss` is the number of losses and
+        `n_relu` is the number of rehus.
+
+    rehu_intercept : {array-like} of shape (n_rehu, n_samples)
+        ReHU coeff matrix, where `n_loss` is the number of losses and
+        `n_relu` is the number of rehus.
+
+    rehu_cut : {array-like} of shape (n_rehu, n_samples)
+        ReHU cutpoints matrix, where `n_loss` is the number of losses and
+        `n_relu` is the number of rehus.
+
+    Example
+    -------
+
+    >>> import numpy as np
+    >>> L, H, n = 3, 2, 100
+    >>> relu_coef, relu_intercept = np.random.randn(L,n), np.random.randn(L,n)
+    >>> rehu_cut, rehu_coef, rehu_intercept = abs(np.random.randn(H,n)), np.random.randn(H,n), np.random.randn(H,n)
+    >>> x = np.random.randn(n)
+    >>> random_loss = ReHLoss(relu_coef, relu_intercept, rehu_coef, rehu_intercept, rehu_cut)
+    >>> random_loss(x)
     """
 
     def __init__(self, relu_coef, relu_intercept,
@@ -21,7 +57,7 @@ class ReHLoss(object):
         self.rehu_intercept = rehu_intercept
         self.H = rehu_coef.shape[0]
         self.L = relu_coef.shape[0]
-        # self.n = relu_coef.shape[1]
+        self.n = relu_coef.shape[1]
 
     def __call__(self, x):
         """Evaluate ReHLoss given a data matrix

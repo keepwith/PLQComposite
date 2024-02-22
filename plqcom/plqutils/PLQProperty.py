@@ -1,10 +1,26 @@
+""" PLQProperty: Several functions to check the properties of a PLQ function. """
+
+# Author: Tingxian Gao <txgao@link.cuhk.edu.hk>
+
+# License: MIT License
+
 import numpy as np
 
 
 def is_continuous(plq_loss):
     """
-        check whether the input PLQ function is continuous
-    :return: True or False
+        Check whether a PLQ loss function is continuous
+
+    Parameters
+    ----------
+    plq_loss : PLQLoss
+         A PLQLoss object
+
+    Returns
+    -------
+    bool
+        Whether the PLQ function is continuous, True for continuous, False for not continuous
+
     """
     cutpoints = plq_loss.cutpoints[1:-1].copy()
     quad_coef = plq_loss.quad_coef.copy()
@@ -23,8 +39,18 @@ def is_continuous(plq_loss):
 
 def is_convex(plq_loss):
     """
-        check whether the input PLQ function is convex
-    ":return: True or False
+        Check whether a PLQ loss function is convex
+
+    Parameters
+    ----------
+    plq_loss : PLQLoss
+         A PLQLoss object
+
+    Returns
+    -------
+    bool
+        Whether the PLQ function is convex, True for convex, False for not convex
+
     """
     # check the second order derivatives
     if min(plq_loss.quad_coef['a']) < 0:
@@ -41,8 +67,14 @@ def is_convex(plq_loss):
 
 def check_cutoff(plq_loss):
     """
-        check whether there exists a cutoff between the knots
-    :return:
+        Check whether there exists a cutoff between the knots, if so, add the cutoff to the knot list and update
+        the coefficients
+
+    Parameters
+    ----------
+    plq_loss : PLQLoss
+         A PLQLoss object
+
     """
     cutpoints = plq_loss.cutpoints.copy()
     quad_coef = plq_loss.quad_coef.copy()
@@ -69,8 +101,14 @@ def check_cutoff(plq_loss):
 
 def find_min(plq_loss):
     """
-        find the minimum knots and value of the PLQ function
-    :return:
+        Find the minimum knots and value of the PLQ function, if the minimum value is greater than zero
+        record the minimum value and knot, remove the minimum value from the PLQ function and update the coefficients
+
+    Parameters
+    ----------
+    plq_loss : PLQLoss
+         A PLQLoss object
+
     """
     # find the minimum value and knot
     out_cut = plq_loss(plq_loss.cutpoints[1:-1])

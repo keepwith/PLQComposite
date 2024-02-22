@@ -1,3 +1,10 @@
+""" PLQLoss: Piecewise Linear Quadratic Loss function, with Decomposition to ReLU-ReHU Composition Loss functions """
+
+# Author: Ben Dai <bendai@cuhk.edu.hk>
+#         Tingxian Gao <txgao@cuhk.edu.hk>
+
+# License: MIT License
+
 import numpy as np
 from plqcom.plqutils import PLQProperty
 from plqcom.ReHLoss import ReHLoss
@@ -6,29 +13,54 @@ from sympy import symbols, solve, Eq
 
 class PLQLoss(object):
     """
-        Piecewise Linear Quadratic Loss function
+    PLQoss: continuous convex piecewise quandratic function (with a function converting to ReHLoss).
+
+    Parameters
+    ----------
+
+    quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
+        The quandratic coefficients in pieces of the PQLoss
+        The i-th piece Q is: a[i]**2 * x**2 + b[i] * x + c[i]
+
+    form : str, optional, default: 'plq'
+        The form of the input PLQ function, 'plq' for the PLQ form, 'minimax' for the minimax form
+        The minimax form is a special form of the PLQ function, which is the maximum of several quadratic functions
+
+    cutpoints : list of cutpoints, optional
+        cutpoints of the PQLoss, except -np.inf and np.inf
+        if the form is 'minimax', the cutpoints is not necessary
+        if the form is 'plq', the cutpoints is necessary
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> cutpoints = [0., 1.]
+    >>> quad_coef = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
+    >>> test_loss = PQLoss(quad_coef, cutpoints=cutpoints)
+    >>> x = np.arange(-2,2,.05)
+    >>> test_loss(x)
     """
 
-    def __init__(self, quad_coef, type="plq", **paras):
+    def __init__(self, quad_coef, form="plq", **paras):
         # check the quad_coef
         if len(quad_coef['a']) != len(quad_coef['b']) or len(quad_coef['a']) != len(quad_coef['c']):
             print("The size of `quad_coef` is not matched!")
             exit()
 
-        # check the type
-        if type not in ['plq', 'minimax']:
-            print("The type of PLQ function is not supported!")
+        # check the input form
+        if form not in ['plq', 'minimax']:
+            print("The input form of PLQ function is not supported!")
             exit()
 
         # minimax form input
-        if type == "minimax":
+        if form == "minimax":
             self.quad_coef, self.cutpoints, self.n_pieces = self.minimax2plq(quad_coef)
             self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
             self.min_val = np.inf
             self.min_knot = np.inf
 
         # PLQ form input
-        elif type == 'plq':
+        elif form == 'plq':
             # check whether the cutpoints are given
             if 'cutpoints' not in paras.keys():
                 print("The `cutpoints` is not given!")
@@ -117,6 +149,7 @@ class PLQLoss(object):
     def _2ReHLoss(self):
         """
             convert the PLQ function to a ReHLoss function
+
         :return:
             an object of ReHLoss
         """
@@ -202,5 +235,8 @@ class PLQLoss(object):
                 rehu_intercept.append(np.sqrt(2 * quad_coef['a'][i]) * cutpoints[i + 1])
                 rehu_cut.append(np.sqrt(2 * quad_coef['a'][i]) * (cutpoints[i + 1] - cutpoints[i]))
 
-        return ReHLoss(np.array(relu_coef), np.array(relu_intercept), np.array(rehu_coef), np.array(rehu_intercept),
-                       np.array(rehu_cut))
+        return ReHLoss(relu_coef=np.array(relu_coef).reshape((-1, 1)),
+                       relu_intercept=np.array(relu_intercept).reshape((-1, 1)),
+                       rehu_coef=np.array(rehu_coef).reshape((-1, 1)),
+                       rehu_intercept=np.array(rehu_intercept).reshape((-1, 1)),
+                       rehu_cut=np.array(rehu_cut).reshape((-1, 1)))

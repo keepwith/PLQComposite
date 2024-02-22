@@ -58,11 +58,12 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_coef)
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
+        print(rehloss.n)
 
     def test_minimax2plq(self):
         #
         print("test 3")
-        plqloss = PLQLoss(type="minimax",
+        plqloss = PLQLoss(form="minimax",
                           quad_coef={'a': np.array([0, 0, 0]), 'b': np.array([-1, 0, 1]), 'c': np.array([-1, 0, -1])})
         rehloss = plqloss._2ReHLoss()
         print(rehloss.relu_coef)
@@ -73,7 +74,7 @@ class Test_PLQLoss(unittest.TestCase):
 
         # y=x^2 y=0 y=2x-1 y=-2x-1
         print("test 4")
-        plqloss = PLQLoss(type="minimax",
+        plqloss = PLQLoss(form="minimax",
                           quad_coef={'a': np.array([1, 0, 0, 0]),
                                      'b': np.array([0, 0, 2, -2]),
                                      'c': np.array([0, 0, -1, -1])})
@@ -86,7 +87,7 @@ class Test_PLQLoss(unittest.TestCase):
 
         # y=1 y=-x y=x y=1/9x^2-2/3x+1
         print("test 5")
-        plqloss = PLQLoss(type="minimax",
+        plqloss = PLQLoss(form="minimax",
                           quad_coef={'a': np.array([0, 0, 0, 1]),
                                      'b': np.array([0, -1, 1, -6]),
                                      'c': np.array([1, 0, 0, 9])})
@@ -96,4 +97,5 @@ class Test_PLQLoss(unittest.TestCase):
         print(rehloss.rehu_coef)
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
+        print(rehloss.n)
 
