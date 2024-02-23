@@ -5,7 +5,7 @@ linear-quadratic (PLQ) convex function as a composite ReLU-ReHU function. In thi
 PLQ loss function and use <a href ="https://github.com/softmin/ReHLine">ReHLine</a> to solve the optimization problem.
 
 - Github repo: [https://github.com/keepwith/PLQComposite](https://github.com/keepwith/PLQComposite)
-- Documentation:
+- Documentation:[docs](docs/build/html/index.html)
 - PyPI:
 - Opensource License: [MIT license](https://opensource.org/licenses/MIT)
 
