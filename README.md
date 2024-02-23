@@ -24,7 +24,7 @@ $$
 or 
 
 $$
-f(x)=max \{ a_0 x^2 + b_0 x + c_0, a_1 x^2 + b_1 x + c_1, ..., a_n x^2 + b_n x + c_n \}.  i=1,2,...,n
+f(x)=max \lbrace a_0 x^2 + b_0 x + c_0, a_1 x^2 + b_1 x + c_1, ..., a_n x^2 + b_n x + c_n \rbrace.  i=1,2,...,n
 $$
 
 then this package will transform the PLQ loss function to a composite ReLU-ReHU function form below:
