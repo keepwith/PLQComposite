@@ -1,6 +1,6 @@
 # PLQ Composite Decomposition <a href="https://github.com/keepwith/PLQComposite"></a>
  
-** PLQ Composite Decomposition ** is designed to be a computational software package to decompose a piecewise 
+**PLQ Composite Decomposition** is designed to be a computational software package to decompose a piecewise 
 linear-quadratic (PLQ) convex function as a composite ReLU-ReHU function. In this case, users can customize the
 PLQ loss function and use <a href ="https://github.com/softmin/ReHLine">ReHLine</a> to solve the optimization problem.
 
