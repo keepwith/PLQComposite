@@ -1,13 +1,13 @@
 """ PLQLoss: Piecewise Linear Quadratic Loss function, with Decomposition to ReLU-ReHU Composition Loss functions """
 
-# Author: Ben Dai <bendai@cuhk.edu.hk>
-#         Tingxian Gao <txgao@cuhk.edu.hk>
+# Author: Tingxian Gao <txgao@cuhk.edu.hk>
+#         Ben Dai <bendai@cuhk.edu.hk>
 
 # License: MIT License
 
 import numpy as np
-from plqcom.plqutils import PLQProperty
-from plqcom.ReHLoss import ReHLoss
+from plqcom import PLQProperty
+from rehline._loss import ReHLoss
 from sympy import symbols, solve, Eq
 
 

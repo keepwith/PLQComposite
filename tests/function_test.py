@@ -1,11 +1,9 @@
-import pytest
 import numpy as np
 import unittest
 
 from plqcom.PLQLoss import PLQLoss
-from plqcom.ReHLoss import ReHLoss
 
-from plqcom.plqutils import PLQProperty
+from plqcom import PLQProperty
 
 
 class Test_PLQLoss(unittest.TestCase):

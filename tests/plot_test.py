@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from plqcom.base import rehu
-from plqcom.base import relu
+from rehline._base import relu, rehu
 
 # right
 x = np.linspace(0, 6, 1000)
