@@ -23,10 +23,14 @@ class PLQLoss(object):
         The i-th piece Q is: a[i]**2 * x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
-        The form of the input PLQ function, 'plq' for the PLQ form, 'minimax' for the minimax form
-        The minimax form is a special form of the PLQ function, which is the maximum of several quadratic functions
+        The form of the input PLQ function
+        'plq' for the PLQ form,
+            In this form, cutpoints must be given explicitly
+        'minimax' for the minimax form
+            The minimax form is a special form of the PLQ function, which is the maximum of several quadratic functions.
+            The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
 
-    cutpoints : list of cutpoints, optional
+    cutpoints : {array-like} of float, optional, default: None
         cutpoints of the PQLoss, except -np.inf and np.inf
         if the form is 'minimax', the cutpoints is not necessary
         if the form is 'plq', the cutpoints is necessary
@@ -41,7 +45,18 @@ class PLQLoss(object):
     >>> test_loss(x)
     """
 
-    def __init__(self, quad_coef, form="plq", **paras):
+    def __init__(self, quad_coef, form="plq", cutpoints=np.empty(shape=(0,))):
+        # check the input data type, if not np.array, convert it to np.array
+        # needed to be fixed further
+        if not isinstance(quad_coef['a'], np.ndarray):
+            quad_coef['a'] = np.array(quad_coef['a'])
+        if not isinstance(quad_coef['b'], np.ndarray):
+            quad_coef['b'] = np.array(quad_coef['b'])
+        if not isinstance(quad_coef['c'], np.ndarray):
+            quad_coef['c'] = np.array(quad_coef['c'])
+        if not isinstance(cutpoints, np.ndarray):
+            cutpoints = np.array(cutpoints)
+
         # check the quad_coef
         if len(quad_coef['a']) != len(quad_coef['b']) or len(quad_coef['a']) != len(quad_coef['c']):
             print("The size of `quad_coef` is not matched!")
@@ -62,14 +77,14 @@ class PLQLoss(object):
         # PLQ form input
         elif form == 'plq':
             # check whether the cutpoints are given
-            if 'cutpoints' not in paras.keys():
+            if cutpoints.size == 0 and len(quad_coef['a']) != 1:
                 print("The `cutpoints` is not given!")
                 exit()
-            elif len(paras['cutpoints']) != (len(quad_coef['a']) - 1):
+            elif len(cutpoints) != (len(quad_coef['a']) - 1):
                 print("The size of cutpoints and quad_coef is not matched!")
                 exit()
             else:
-                self.cutpoints = np.concatenate(([-np.inf], paras['cutpoints'], [np.inf]))
+                self.cutpoints = np.concatenate(([-np.inf], cutpoints, [np.inf]))
             self.quad_coef = quad_coef
             self.n_pieces = len(self.quad_coef['a'])
             self.min_val = np.inf
@@ -103,19 +118,21 @@ class PLQLoss(object):
         """
             convert the minimax form to the PLQ form
         """
-        solutions = []
+        solutions = np.array([])
         n_pieces = len(quad_coef['a'])
         x = symbols('x', real=True)
         for i in range(n_pieces):
             for j in range(i + 1, n_pieces):
-                solutions += solve(Eq(quad_coef['a'][i] * x ** 2 + quad_coef['b'][i] * x + quad_coef['c'][i],
-                                      quad_coef['a'][j] * x ** 2 + quad_coef['b'][j] * x + quad_coef['c'][j]), x)
+                solutions = np.append(solutions,
+                                      solve(Eq(quad_coef['a'][i] * x ** 2 + quad_coef['b'][i] * x + quad_coef['c'][i],
+                                               quad_coef['a'][j] * x ** 2 + quad_coef['b'][j] * x + quad_coef['c'][j]),
+                                            x))
 
-        solutions = list(set(solutions))  # remove the duplicate solutions
+        solutions = list(set(solutions.tolist()))  # remove the duplicate solutions
         cutpoints = np.sort(np.array(solutions, dtype=float))
 
         if len(cutpoints) == 0:
-            ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x=0
+            ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x = 0
             new_quad_coef = {'a': np.array([quad_coef['a'][ind_tmp]]), 'b': np.array([quad_coef['b'][ind_tmp]]),
                              'c': np.array([quad_coef['c'][ind_tmp]])}
             new_cutpoints = np.array([])
@@ -133,8 +150,9 @@ class PLQLoss(object):
             # merge the successive intervals with the same coefficients
             i = 0
             while i < len(new_quad_coef['a']) - 1:
-                if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and new_quad_coef['b'][i] == new_quad_coef['b'][
-                    i + 1] and new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
+                if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and
+                        new_quad_coef['b'][i] == new_quad_coef['b'][i + 1] and
+                        new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
                     new_quad_coef['a'] = np.delete(new_quad_coef['a'], i + 1)
                     new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
                     new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
@@ -144,6 +162,7 @@ class PLQLoss(object):
 
             new_cutpoints = cutpoints
             new_n_pieces = len(new_quad_coef['a'])
+
         return new_quad_coef, new_cutpoints, new_n_pieces
 
     def _2ReHLoss(self):

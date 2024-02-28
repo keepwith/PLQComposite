@@ -53,7 +53,7 @@ def is_convex(plq_loss):
 
     """
     # check the second order derivatives
-    if min(plq_loss.quad_coef['a']) < 0:
+    if np.min(plq_loss.quad_coef['a']) < 0:
         return False
 
     # compare the first order derivatives at cut points
@@ -112,7 +112,7 @@ def find_min(plq_loss):
     """
     # find the minimum value and knot
     out_cut = plq_loss(plq_loss.cutpoints[1:-1])
-    plq_loss.min_val = min(out_cut)
+    plq_loss.min_val = np.min(out_cut)
     plq_loss.min_knot = np.argmin(out_cut) + 1
     # remove self.min_val from the PLQ function
     plq_loss.quad_coef['c'] = plq_loss.quad_coef['c'] + (-plq_loss.min_val)
