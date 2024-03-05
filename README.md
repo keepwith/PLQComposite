@@ -196,7 +196,8 @@ plq_loss_1(x)
 
 #### **PLQLoss:_2ReHLoss**
 A method convert the above PLQLoss to $(ReLU-ReHU)$ form.  
-It will return a ReHLoss object with relu and rehu parameters. Just like $(ReLU-ReHU)$ form.
+It will return a ReHLoss object with relu and rehu parameters. Just like $(ReLU-ReHU)$ form.  
+
 **Usage**
 ```python
 rehloss=plq_loss_1._2ReHLoss()
