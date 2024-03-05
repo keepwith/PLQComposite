@@ -19,7 +19,7 @@ class PLQLoss(object):
     ----------
 
     quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
-        The quandratic coefficients in pieces of the PQLoss
+        The quandratic coefficients in pieces of the PLQoss
         The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
@@ -31,7 +31,7 @@ class PLQLoss(object):
             The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
 
     cutpoints : {array-like} of float, optional, default: None
-        cutpoints of the PQLoss, except -np.inf and np.inf
+        cutpoints of the PLQoss, except -np.inf and np.inf
         if the form is 'minimax', the cutpoints is not necessary
         if the form is 'plq', the cutpoints is necessary
 
@@ -40,7 +40,7 @@ class PLQLoss(object):
     >>> import numpy as np
     >>> cutpoints = [0., 1.]
     >>> quad_coef = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
-    >>> test_loss = PQLoss(quad_coef, cutpoints=cutpoints)
+    >>> test_loss = PLQoss(quad_coef, cutpoints=cutpoints)
     >>> x = np.arange(-2,2,.05)
     >>> test_loss(x)
     """
@@ -91,7 +91,7 @@ class PLQLoss(object):
             self.min_knot = np.inf
 
     def __call__(self, x):
-        """ Evaluation of PQLoss
+        """ Evaluation of PLQLoss
 
         out = quad_coef['a'][i]*x**2 + quad_coef['b'][i]*x + quad_coef['c'][i], if cutpoints[i] < x < cutpoints[i+1]
         """

@@ -165,7 +165,7 @@ To help you understand this operation better, we give the parameter of the broad
 A class represents a univarite continuous convex piecewise linear-quadratic(PLQ) Loss function.
 
 **quad_coef:**
-It is a dictionary stores the coefficients in pieces of the PQLoss
+It is a dictionary stores the coefficients in pieces of the PLQoss
 The i-th piece is: $a_ix^2 + b_ix + c_i$
 **form:**
 means the form of PLQLoss. 
@@ -181,11 +181,11 @@ from plqcom.PLQLoss import PLQLoss
 # create type 1 (plq)
 cutpoints_1 = np.array([0., 1.])
 quad_coef_1 = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
-plq_loss_1 = PQLoss(quad_coef_1, cutpoints=cutpoints_1, form="plq")
+plq_loss_1 = PLQoss(quad_coef_1, cutpoints=cutpoints_1, form="plq")
 
 # create type 2 (minimax)
 quad_coef_2 = {'a': np.array([0., 0., 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([-1., 0., -1.])}
-plq_loss_2 = PQLoss(quad_coef_2, form="minimax")
+plq_loss_2 = PLQoss(quad_coef_2, form="minimax")
 
 # You can also evaluate the plqloss directly
 x = np.arange(-2,2,.05)
