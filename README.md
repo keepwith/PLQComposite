@@ -22,11 +22,11 @@
 
 **Empirical risk minimization (ERM)** is a crucial framework that offers a general approach to handling a broad range of machine learning tasks. 
 
-Given a general regularized ERM problem based on a convex **piecewise linear-quadratic(PLQ) loss** with the form $\eqref{eq:1}$ below.
+Given a general regularized ERM problem based on a convex **piecewise linear-quadratic(PLQ) loss** with the form $(1)$ below.
 
 
 $$
-\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  \text{L}_i( \mathbf{x}_ i^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1} \label{eq:1}
+\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  \text{L}_i( \mathbf{x}_ i^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
 $$
 
 
@@ -34,11 +34,11 @@ Let $z_i=\mathbf{x}_ i^\intercal \mathbf{\beta}$, then $L_i(z_i)$ is a univariat
 
 
 
-**PLQ Composite Decomposition** is designed to be a computational software package which adopts a **two-step method** (**decompose** and **broadcast**) convert an arbitrary convex PLQ loss function in (1) to a **composite ReLU-ReHU Loss** function with the form $\eqref{eq:2}$ below. 
+**PLQ Composite Decomposition** is designed to be a computational software package which adopts a **two-step method** (**decompose** and **broadcast**) convert an arbitrary convex PLQ loss function in $(1)$ to a **composite ReLU-ReHU Loss** function with the form $(2)$ below. 
 
 
 $$
-L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{2} \label{eq:2}
+L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{2} 
 $$
 
 where $u_{l},v_{l}$ and $s_{h},t_{h},\tau_{h}$ are the ReLU-ReHU loss parameters.
@@ -77,7 +77,7 @@ Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine
 ## Formulation
 ### Decompose Stage
 In decompose stage, the main task is to convert a single convex PLQ Loss function $L(z)$
- with form $\eqref{eq:plq}$ and $\eqref{eq:minimax}$ to the form $\eqref{eq:ReLU-ReHU}$
+ with form $(plq)$ and $(minimax)$ to the form $(ReLU-ReHU)$
 
 $$
 L(z)=
@@ -86,7 +86,7 @@ L(z)=
 \ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, i=1,2,...,n-1 \\
 \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
 \end{cases}
-\tag{plq} \label{eq:plq}
+\tag{plq} 
 $$
 
 
@@ -95,44 +95,44 @@ or
 
 $$
 L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace.  i=1,2,...,n
-\tag{minimax} \label{eq:minimax}
+\tag{minimax} 
 $$
 
 
 $$
-L(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{ReLU-ReHU} \label{eq:ReLU-ReHU}
+L(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{ReLU-ReHU} 
 $$
 
 
 ### Broadcast Stage
-In broadcast stage, then main task is to broadcast the $L(z)$ with the form $\eqref{eq:ReLU-ReHU}$ in decompose stage to all the data points. i.e. generate $L_i(z_i)$ from the $L(z)$ above.
+In broadcast stage, then main task is to broadcast the $L(z)$ with the form $(ReLU-ReHU)$ in decompose stage to all the data points. i.e. generate $L_i(z_i)$ from the $L(z)$ above.
 
-Usually, there exists a special relationship $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}) \tag{b1} \label{eq:b1}$$  
+Usually, there exists a special relationship $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}) \tag{b1}$$  
 
-On the other hands, from the **Proposition 1 in [1]** the composite $\eqref{eq:ReLU-ReHU}$ function class is closed under affine transformations.
+On the other hands, from the **Proposition 1 in [1]** the composite $(ReLU-ReHU)$ function class is closed under affine transformations.
 
-**Proposition 1 (Closure under affine transformation).** If $L(z)$ is a composite $ReLU-ReHU$ function as in $\eqref{eq:ReLU-ReHU}$, then for any $c>0,\  p\in\mathbb{R}, \ and \ q\in\mathbb{R}, \ cL(pz+q)$ is also composite $ReLU-ReHU$ function, that is,
+**Proposition 1 (Closure under affine transformation).** If $L(z)$ is a composite $ReLU-ReHU$ function as in $(ReLU-ReHU)$, then for any $c>0,\  p\in\mathbb{R}, \ and \ q\in\mathbb{R}, \ cL(pz+q)$ is also composite $ReLU-ReHU$ function, that is,
 
 
 $$
-cL(pz+q)=\sum_{l=1}^L \text{ReLU}( u_{l}^{\prime} z + v_{l}^{\prime}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}^{\prime}}( s_{h}^{\prime} z + t_{h}^{\prime}), \tag{b2} \label{eq:b2}
+cL(pz+q)=\sum_{l=1}^L \text{ReLU}( u_{l}^{\prime} z + v_{l}^{\prime}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}^{\prime}}( s_{h}^{\prime} z + t_{h}^{\prime}), \tag{b2} 
 $$
 
 
 $where \ u_{l}^{\prime}=cpu_{l}, \ v_{l}^{\prime}=cu_{l}q+cv_{l}, \ \tau_{h}^{\prime}=\sqrt{c}\tau_{h},\ s_{h}^{\prime}=\sqrt{c}ps_{h}, \ and \ t_{h}^{\prime}=\sqrt{c}(s_{h}q+t_{h}).$
 
 
-we combine $\eqref{eq:b1}$ and $\eqref{eq:b2}$, then we have 
+we combine $(b1)$ and $(b2)$, then we have 
 $$
-L_{i}(z_{i})=c_{i}L(p_{i}z_{i}+q_{i})=\sum_{l=1}^L \text{ReLU}( u_{li}^{\prime} z_{i} + v_{li}^{\prime}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}^{\prime}}( s_{hi}^{\prime} z_{i} + t_{hi}^{\prime}), \tag{b3} \label{eq:b3}
+L_{i}(z_{i})=c_{i}L(p_{i}z_{i}+q_{i})=\sum_{l=1}^L \text{ReLU}( u_{li}^{\prime} z_{i} + v_{li}^{\prime}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}^{\prime}}( s_{hi}^{\prime} z_{i} + t_{hi}^{\prime}), \tag{b3} 
 $$
 
 
-substitute $\eqref{eq:b3}$ to $\eqref{eq:1}$ then we have
+substitute $(b3)$ to $(1)$ then we have
 
 
 $$
-\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n \sum_{l=1}^L \text{ReLU}( u_{li} \mathbf{x}_ i^\intercal \mathbf{\beta} + v_{li}) + \sum_{i=1}^n \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}}( s_{hi} \mathbf{x}_ i^\intercal \mathbf{\beta} + t_{hi}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0}, \tag{b4}\label{eq:b4}
+\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n \sum_{l=1}^L \text{ReLU}( u_{li} \mathbf{x}_ i^\intercal \mathbf{\beta} + v_{li}) + \sum_{i=1}^n \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}}( s_{hi} \mathbf{x}_ i^\intercal \mathbf{\beta} + t_{hi}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0}, \tag{b4}
 $$
 
 
@@ -150,7 +150,7 @@ To help you understand this operation better, we give the parameter of the broad
 |$SVM^2$|$c_{i}((1-y_{i} z_{i})_{+})^{2}$ |  $$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ z^{2} &\text{if } z \geq 0 \end{cases} $$|$p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
 |$LAD$|$c_{i} \| y_{i}-z_{i}\|$ | $$L(z)=\begin{cases}\ -z &\text{if } z < 0 \\ \ z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ |
 |$SVR$ | $c_{i} (\| y_{i}-z_{i}\|-\epsilon)_{+}$|$$L(z)=\begin{cases}\ -z-\epsilon &\text{if } z < -{\epsilon} \\ \ 0 &\text{if } -{\epsilon} \leq z < {\epsilon} \\ \ z-{\epsilon} &\text{if } z \geq {\epsilon} \end{cases} $$ | $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ |
-|$QR$ | $c_{i}{\rho}_{\kappa}(y_{i}-z_{i})$|$$L(z)=\begin{cases}\ ({\kappa}-1)z &\text{if } z < 0 \\ \ {\kappa}z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ ||
+|$QR$ | $c_{i}{\rho}_{\kappa}(y_{i}-z_{i}) $|$$L(z)=\begin{cases}\ ({\kappa}-1)z &\text{if } z < 0 \\ \ {\kappa}z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ ||
 
 
 
