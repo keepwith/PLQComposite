@@ -26,7 +26,7 @@ Given a general regularized ERM problem based on a convex **piecewise linear-qua
 
 
 $$
-\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  \text{L}_i( \mathbf{x}_ i^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
+\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  \text{L}_i( \mathbf{x}_{i}^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
 $$
 
 
@@ -122,7 +122,8 @@ $$
 $where \ u_{l}^{\prime}=cpu_{l}, \ v_{l}^{\prime}=cu_{l}q+cv_{l}, \ \tau_{h}^{\prime}=\sqrt{c}\tau_{h},\ s_{h}^{\prime}=\sqrt{c}ps_{h}, \ and \ t_{h}^{\prime}=\sqrt{c}(s_{h}q+t_{h}).$
 
 
-we combine $(b1)$ and $(b2)$, then we have 
+we combine $(b1)$ and $(b2)$, then we have
+
 $$
 L_{i}(z_{i})=c_{i}L(p_{i}z_{i}+q_{i})=\sum_{l=1}^L \text{ReLU}( u_{li}^{\prime} z_{i} + v_{li}^{\prime}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}^{\prime}}( s_{hi}^{\prime} z_{i} + t_{hi}^{\prime}), \tag{b3} 
 $$
@@ -143,14 +144,14 @@ With the above parameters and data, we can utilize <a href ="https://github.com/
 To help you understand this operation better, we give the parameter of the broadcast of some widely used loss functions.
 
 **Widely Used Loss Functions and Broadcast Parameters**
-|  PROBLEM  | Loss($L_{i}(z_{i})$)  | $L(z)$  | Broadcast Parameters|
+|  PROBLEM  | Loss( $L_{i}(z_{i})$ )  | $L(z)$  | Broadcast Parameters|
 |  ----  | ----  | ----  | ----  |
 |$SVM$ | $c_{i}(1-y_{i} z_{i})_{+}$ | $$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ z &\text{if } z \geq 0 \end{cases} $$|$p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
 |$sSVM$ | $c_{i}ReHU_{1}(-(y_{i} z_{i}-1))$|$$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ \frac{z^{2}}{2} &\text{if } 0 \leq z < 1 \\ \ z-\frac{1}{2} &\text{if } z \geq 1 \end{cases} $$ | $p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
 |$SVM^2$|$c_{i}((1-y_{i} z_{i})_{+})^{2}$ |  $$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ z^{2} &\text{if } z \geq 0 \end{cases} $$|$p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
 |$LAD$|$c_{i} \| y_{i}-z_{i}\|$ | $$L(z)=\begin{cases}\ -z &\text{if } z < 0 \\ \ z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ |
 |$SVR$ | $c_{i} (\| y_{i}-z_{i}\|-\epsilon)_{+}$|$$L(z)=\begin{cases}\ -z-\epsilon &\text{if } z < -{\epsilon} \\ \ 0 &\text{if } -{\epsilon} \leq z < {\epsilon} \\ \ z-{\epsilon} &\text{if } z \geq {\epsilon} \end{cases} $$ | $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ |
-|$QR$ | $c_{i}{\rho}_{\kappa}(y_{i}-z_{i}) $|$$L(z)=\begin{cases}\ ({\kappa}-1)z &\text{if } z < 0 \\ \ {\kappa}z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ ||
+|$QR$ | $c_{i}{\rho}_{\kappa}(y_{i}-z_{i})$|$$L(z)=\begin{cases}\ ({\kappa}-1)z &\text{if } z < 0 \\ \ {\kappa}z &\text{if } z \geq 0 \end{cases} $$| $p_{i}=-1, \ q_{i}=y_{i}, \ c_{i}=c_{i}$ ||
 
 
 
