@@ -13,7 +13,7 @@ from sympy import symbols, solve, Eq
 
 class PLQLoss(object):
     """
-    PLQoss: continuous convex piecewise quandratic function (with a function converting to ReHLoss).
+    PLQLoss: continuous convex piecewise quandratic function (with a function converting to ReHLoss).
 
     Parameters
     ----------

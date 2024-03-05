@@ -8,11 +8,9 @@
   - [Decompose Stage](#Decompose_Stage)
   - [Broadcast Stage](#Broadcast_Stage)
 - [Core Modules](#Core-Modules)
-  - [PLQLoss](#PLQLoss)
-    - [minimax2PLQ](#minimax2PLQ)
-    - [_2ReHLoss](#_2ReHLoss)
-  - [ReHProperty](#ReHProperty)
-  - [Affine transformation](#Affine-transformation)
+  - [Class:PLQLoss](#Class:PLQLoss)
+    - [PLQLoss:_2ReHLoss](#PLQLoss:_2ReHLoss)
+  - [ReHProperty:Affine transformation](#ReHProperty:Affine-transformation)
 - [Examples](#Examples)
 - [References](#References)
 
@@ -20,7 +18,7 @@
 ## Introduction
  
 
-**Empirical risk minimization (ERM)** is a crucial framework that offers a general approach to handling a broad range of machine learning tasks. 
+**Empirical risk minimization (ERM)[2]** is a crucial framework that offers a general approach to handling a broad range of machine learning tasks. 
 
 Given a general regularized ERM problem based on a convex **piecewise linear-quadratic(PLQ) loss** with the form $(1)$ below.
 
@@ -107,7 +105,9 @@ $$
 ### Broadcast Stage
 In broadcast stage, then main task is to broadcast the $L(z)$ with the form $(ReLU-ReHU)$ in decompose stage to all the data points. i.e. generate $L_i(z_i)$ from the $L(z)$ above.
 
-Usually, there exists a special relationship $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}) \tag{b1}$$  
+Usually, there exists a special relationship (If relationship not holds, you have to mannully do the decomposition stage n times)
+
+$$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}) \tag{b1}$$  
 
 On the other hands, from the **Proposition 1 in [1]** the composite $(ReLU-ReHU)$ function class is closed under affine transformations.
 
@@ -160,19 +160,102 @@ To help you understand this operation better, we give the parameter of the broad
 
 ## Core Modules
 
-### PLQLoss
-A class to define a PLQ loss function. Accepted initialization can be coefficients with cutpoints, or a list of convex quadratic
-functions.
-#### minimax2PLQ
+### **Class:PLQLoss**
 
-#### _2ReHLoss
+A class represents a univarite continuous convex piecewise linear-quadratic(PLQ) Loss function.
 
-### ReHProperty
-#### Affine transformation
+**quad_coef:**
+It is a dictionary stores the coefficients in pieces of the PQLoss
+The i-th piece is: $a_ix^2 + b_ix + c_i$
+**form:**
+means the form of PLQLoss. 
+Two types of input are accepted (plq) and (minimax).
+**cutpoints:**
+In plq form, cutpoints should be given. In minimax form, the cutpoints will be calculated by the built-in function minimax2plq. 
+
+**Usage**
+```python=
+import numpy as np
+from plqcom.PLQLoss import PLQLoss
+
+# create type 1 (plq)
+cutpoints_1 = np.array([0., 1.])
+quad_coef_1 = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
+plq_loss_1 = PQLoss(quad_coef_1, cutpoints=cutpoints_1, form="plq")
+
+# create type 2 (minimax)
+quad_coef_2 = {'a': np.array([0., 0., 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([-1., 0., -1.])}
+plq_loss_2 = PQLoss(quad_coef_2, form="minimax")
+
+# You can also evaluate the plqloss directly
+x = np.arange(-2,2,.05)
+plq_loss_1(x)
+
+```
+
+#### **PLQLoss:_2ReHLoss**
+A method convert the above PLQLoss to $(ReLU-ReHU)$ form.
+It will return a ReHLoss object with relu and rehu parameters. Just like $(ReLU-ReHU)$ form.
+**Usage**
+```python=
+rehloss=plq_loss_1._2ReHLoss()
+```
+
+#### **ReHProperty:Affine transformation**
+The purpose of this function is to utilize $(b1)$ and affine closure property of ReHLoss to broadcast $L(z)$ to all $L_i(z_i)=c_iL(pz_i+q)$
+**rehloss** :  A ReHLoss object
+**c:** scale parameter on loss function and require c > 0
+**p:** scale parameter on $z_i$
+**q:** shift parameter on $z_i$
+**n:** the length of the data
+The $c$, $p$, $q$ above can be either a single number or an array.  
+A single number stands for all $c_i$ (or $p_i$, $q_i$) are the same for all $i$.
+An array with the length n means they differ.
+
+**Usage**
+```python=
+# simulate classification dataset
+n, d, C = 1000, 3, 0.5
+np.random.seed(1024)
+X = np.random.randn(1000, 3)
+beta0 = np.random.randn(3)
+y = np.sign(X.dot(beta0) + np.random.randn(n))
+
+rehloss=plq_loss_1._2ReHLoss()
+rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
+```
 
 
 ## Examples
+```python=
+import numpy as np
+from plqcom.PLQLoss import PLQLoss
+from plqcom.ReHProperty import affine_transformation
+from rehline import ReHLine
 
+# simulate classification dataset
+n, d, C = 1000, 3, 0.5
+np.random.seed(1024)
+X = np.random.randn(1000, 3)
+beta0 = np.random.randn(3)
+y = np.sign(X.dot(beta0) + np.random.randn(n))
+
+# Step-1: Create a PLQLoss and call _2ReHLoss method to convert it to ReLU-ReHU form
+plqloss = PLQLoss(quad_coef={'a': np.array([0., 0.]), 'b': np.array([0., 1.]), 'c': np.array([0., 0.])},
+				  cutpoints=np.array([0]))
+rehloss = plqloss._2ReHLoss()
+
+# Step-2: Use the affine_transformation method to broadcast L to all data points
+rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
+
+# Step-3 use the ReHLine to solve the problem
+clf_3 = ReHLine(loss={'name': 'custom'}, C=C)
+clf_3.U, clf_3.V = rehloss.relu_coef, rehloss.relu_intercept
+clf_3.fit(X=X)
+
+print('sol privided by rehline: %s' % clf_3.coef_)
+print(clf_3.decision_function([[.1, .2, .3]]))
+```
 
 ## References
 
