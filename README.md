@@ -12,6 +12,7 @@
     - [PLQLoss:_2ReHLoss](#PLQLoss_2ReHLoss)
   - [ReHProperty:Affine transformation](#ReHPropertyAffine-transformation)
 - [Examples](#Examples)
+  - [Test SVM on simulated dataset](#Test-SVM-on-simulated-dataset)
 - [References](#References)
 
 
@@ -166,12 +167,12 @@ A class represents a univarite continuous convex piecewise linear-quadratic(PLQ)
 
 **quad_coef:**  
 It is a dictionary stores the coefficients in pieces of the PLQoss
-The i-th piece is: $a_ix^2 + b_ix + c_i$
+The i-th piece is: $a_ix^2 + b_ix + c_i$  
 **form:**  
 means the form of PLQLoss.  
-Two types of input are accepted (plq) and (minimax).
+Two types of input are accepted (plq) and (minimax).  
 **cutpoints:**  
-In plq form, cutpoints should be given. In minimax form, the cutpoints will be calculated by the built-in function minimax2plq. 
+In plq form, cutpoints should be given. In minimax form, the cutpoints will be calculated by the built-in function **minimax2plq**. 
 
 **Usage**
 ```python
@@ -194,7 +195,7 @@ plq_loss_1(x)
 ```
 
 #### **PLQLoss:_2ReHLoss**
-A method convert the above PLQLoss to $(ReLU-ReHU)$ form.
+A method convert the above PLQLoss to $(ReLU-ReHU)$ form.  
 It will return a ReHLoss object with relu and rehu parameters. Just like $(ReLU-ReHU)$ form.
 **Usage**
 ```python
@@ -202,7 +203,7 @@ rehloss=plq_loss_1._2ReHLoss()
 ```
 
 #### **ReHProperty:Affine transformation**
-The purpose of this function is to utilize $(b1)$ and affine closure property of ReHLoss to broadcast $L(z)$ to all $L_i(z_i)=c_iL(pz_i+q)$  
+The purpose of this function is to utilize $(b1)$ and **Proposition 1 (Closure under affine transformation)** of ReHLoss to broadcast $L(z)$ to all $L_i(z_i)=c_iL(pz_i+q)$  
 **rehloss** :  A ReHLoss object  
 **c:** scale parameter on loss function and require c > 0  
 **p:** scale parameter on $z_i$  
@@ -227,6 +228,7 @@ rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
 
 
 ## Examples
+### Test SVM on simulated dataset
 ```python
 import numpy as np
 from plqcom.PLQLoss import PLQLoss
