@@ -160,17 +160,17 @@ To help you understand this operation better, we give the parameter of the broad
 
 ## Core Modules
 
-### **Class:PLQLoss**
+### **Class:PLQLoss**  
 
-A class represents a univarite continuous convex piecewise linear-quadratic(PLQ) Loss function.
+A class represents a univarite continuous convex piecewise linear-quadratic(PLQ) Loss function.  
 
-**quad_coef:**
+**quad_coef:**  
 It is a dictionary stores the coefficients in pieces of the PLQoss
 The i-th piece is: $a_ix^2 + b_ix + c_i$
-**form:**
-means the form of PLQLoss. 
+**form:**  
+means the form of PLQLoss.  
 Two types of input are accepted (plq) and (minimax).
-**cutpoints:**
+**cutpoints:**  
 In plq form, cutpoints should be given. In minimax form, the cutpoints will be calculated by the built-in function minimax2plq. 
 
 **Usage**
@@ -202,12 +202,12 @@ rehloss=plq_loss_1._2ReHLoss()
 ```
 
 #### **ReHProperty:Affine transformation**
-The purpose of this function is to utilize $(b1)$ and affine closure property of ReHLoss to broadcast $L(z)$ to all $L_i(z_i)=c_iL(pz_i+q)$
-**rehloss** :  A ReHLoss object
-**c:** scale parameter on loss function and require c > 0
-**p:** scale parameter on $z_i$
-**q:** shift parameter on $z_i$
-**n:** the length of the data
+The purpose of this function is to utilize $(b1)$ and affine closure property of ReHLoss to broadcast $L(z)$ to all $L_i(z_i)=c_iL(pz_i+q)$  
+**rehloss** :  A ReHLoss object  
+**c:** scale parameter on loss function and require c > 0  
+**p:** scale parameter on $z_i$  
+**q:** shift parameter on $z_i$  
+**n:** the length of the data  
 The $c$, $p$, $q$ above can be either a single number or an array.  
 A single number stands for all $c_i$ (or $p_i$, $q_i$) are the same for all $i$.
 An array with the length n means they differ.
