@@ -174,7 +174,7 @@ Two types of input are accepted (plq) and (minimax).
 In plq form, cutpoints should be given. In minimax form, the cutpoints will be calculated by the built-in function minimax2plq. 
 
 **Usage**
-```python=
+```python
 import numpy as np
 from plqcom.PLQLoss import PLQLoss
 
@@ -197,7 +197,7 @@ plq_loss_1(x)
 A method convert the above PLQLoss to $(ReLU-ReHU)$ form.
 It will return a ReHLoss object with relu and rehu parameters. Just like $(ReLU-ReHU)$ form.
 **Usage**
-```python=
+```python
 rehloss=plq_loss_1._2ReHLoss()
 ```
 
@@ -213,7 +213,7 @@ A single number stands for all $c_i$ (or $p_i$, $q_i$) are the same for all $i$.
 An array with the length n means they differ.
 
 **Usage**
-```python=
+```python
 # simulate classification dataset
 n, d, C = 1000, 3, 0.5
 np.random.seed(1024)
@@ -227,7 +227,7 @@ rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
 
 
 ## Examples
-```python=
+```python
 import numpy as np
 from plqcom.PLQLoss import PLQLoss
 from plqcom.ReHProperty import affine_transformation
