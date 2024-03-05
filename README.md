@@ -9,7 +9,7 @@
   - [Broadcast Stage](#Broadcast_Stage)
 - [Core Modules](#Core-Modules)
   - [Class:PLQLoss](#ClassPLQLoss)
-    - [PLQLoss:_2ReHLoss](#PLQLoss:2ReHLoss)
+    - [PLQLoss:_2ReHLoss](#PLQLoss:ReHLoss)
   - [ReHProperty:Affine transformation](#ReHPropertyAffine-transformation)
 - [Examples](#Examples)
 - [References](#References)
