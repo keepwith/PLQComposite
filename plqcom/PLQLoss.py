@@ -20,7 +20,7 @@ class PLQLoss(object):
 
     quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
         The quandratic coefficients in pieces of the PQLoss
-        The i-th piece Q is: a[i]**2 * x**2 + b[i] * x + c[i]
+        The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
         The form of the input PLQ function
