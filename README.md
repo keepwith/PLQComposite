@@ -26,7 +26,7 @@ Given a general regularized ERM problem based on a convex **piecewise linear-qua
 
 
 $$
-\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  \text{L}_i( \mathbf{x}_{i}^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
+\min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
 $$
 
 
@@ -144,7 +144,7 @@ With the above parameters and data, we can utilize <a href ="https://github.com/
 To help you understand this operation better, we give the parameter of the broadcast of some widely used loss functions.
 
 **Widely Used Loss Functions and Broadcast Parameters**
-|  PROBLEM  | Loss( $L_{i}(z_{i})$ )  | $L(z)$  | Broadcast Parameters|
+|  PROBLEM  | Loss($L_{i}(z_{i})$)  | $L(z)$  | Broadcast Parameters|
 |  ----  | ----  | ----  | ----  |
 |$SVM$ | $c_{i}(1-y_{i} z_{i})_{+}$ | $$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ z &\text{if } z \geq 0 \end{cases} $$|$p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
 |$sSVM$ | $c_{i}ReHU_{1}(-(y_{i} z_{i}-1))$|$$L(z)=\begin{cases}\ 0 &\text{if } z < 0 \\ \ \frac{z^{2}}{2} &\text{if } 0 \leq z < 1 \\ \ z-\frac{1}{2} &\text{if } z \geq 1 \end{cases} $$ | $p_{i}=-y_{i}, \ q_{i}=1, \ c_{i}=c_{i}$ |
