@@ -20,6 +20,12 @@ def is_continuous(plq_loss):
     bool
         Whether the PLQ function is continuous, True for continuous, False for not continuous
 
+    Examples
+    --------
+    >>> from plqcom import PLQLoss
+    >>> plq_loss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> PLQProperty.is_continuous(plq_loss)
+    >>> True
     """
     cutpoints = plq_loss.cutpoints[1:-1].copy()
     quad_coef = plq_loss.quad_coef.copy()
@@ -49,6 +55,12 @@ def is_convex(plq_loss):
     bool
         Whether the PLQ function is convex, True for convex, False for not convex
 
+    Examples
+    --------
+    >>> from plqcom import PLQLoss
+    >>> plq_loss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> PLQProperty.is_convex(plq_loss)
+    >>> True
     """
     # check the second order derivatives
     if np.min(plq_loss.quad_coef['a']) < 0:
@@ -72,6 +84,13 @@ def check_cutoff(plq_loss):
     plq_loss : PLQLoss
          A PLQLoss object
 
+    Examples
+    --------
+    >>> from plqcom import PLQLoss
+    >>> plq_loss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> PLQProperty.check_cutoff(plq_loss)
+    >>> plq_loss.cutpoints
+    >>> [0.]
     """
     cutpoints = plq_loss.cutpoints.copy()
     quad_coef = plq_loss.quad_coef.copy()
@@ -105,6 +124,13 @@ def find_min(plq_loss):
     plq_loss : PLQLoss
          A PLQLoss object
 
+    Examples
+    --------
+    >>> from plqcom import PLQLoss
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> PLQProperty.find_min(plq_loss)
+    >>> plq_loss.min_val
+    >>> 1
     """
     # find the minimum value and knot
     out_cut = plq_loss(plq_loss.cutpoints[1:-1])

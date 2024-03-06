@@ -16,15 +16,34 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0):
     ----------
     rehloss : ReHLoss
          A ReHLoss object
-    c: scale parameter on loss function and require c > 0
-    p: scale parameter on z
-    q: shift parameter on z
+    c: a number or {array_like} of shape (n_samples,), default=1
+        scale parameter on loss function and require c > 0
+    p: a number or {array_like} of shape (n_samples,),default=1
+        scale parameter on z
+    q: a number or {array_like} of shape (n_samples,),default=0
+        shift parameter on z
+    n: int, default=1
+        number of samples
 
     Returns
     -------
     ReHLoss
         A ReHLoss object after affine transformation
 
+    Examples
+    --------
+    >>> from plqcom.PLQLoss import PLQLoss
+    >>> from plqcom.ReHProperty import affine_transformation
+    >>> import numpy as np
+    >>> from rehline import ReHLine
+    >>> n, d, C = 1000, 3, 0.5
+    >>> np.random.seed(1024)
+    >>> X = np.random.randn(1000, 3)
+    >>> beta0 = np.random.randn(3)
+    >>> y = np.sign(X.dot(beta0) + np.random.randn(n))
+    >>> plqloss = PLQLoss(quad_coef={'a': np.array([0., 0.]), 'b': np.array([0., 1.]), 'c': np.array([0., 0.])}, cutpoints=np.array([0]))
+    >>> rehloss = plqloss._2ReHLoss()
+    >>> rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
     """
 
     loss = ReHLoss(relu_coef=rehloss.relu_coef, relu_intercept=rehloss.relu_intercept,
