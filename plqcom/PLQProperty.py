@@ -8,8 +8,7 @@ import numpy as np
 
 
 def is_continuous(plq_loss):
-    """
-        Check whether a PLQ loss function is continuous
+    """Check whether a PLQ loss function is continuous
 
     Parameters
     ----------
@@ -38,8 +37,7 @@ def is_continuous(plq_loss):
 
 
 def is_convex(plq_loss):
-    """
-        Check whether a PLQ loss function is convex
+    """Check whether a PLQ loss function is convex
 
     Parameters
     ----------
@@ -66,9 +64,8 @@ def is_convex(plq_loss):
 
 
 def check_cutoff(plq_loss):
-    """
-        Check whether there exists a cutoff between the knots, if so, add the cutoff to the knot list and update
-        the coefficients
+    """Check whether there exists a cutoff between the knots, if so, add the cutoff to the knot list and update
+    the coefficients
 
     Parameters
     ----------
@@ -100,9 +97,8 @@ def check_cutoff(plq_loss):
 
 
 def find_min(plq_loss):
-    """
-        Find the minimum knots and value of the PLQ function, if the minimum value is greater than zero
-        record the minimum value and knot, remove the minimum value from the PLQ function and update the coefficients
+    """Find the minimum knots and value of the PLQ function, if the minimum value is greater than zero
+    record the minimum value and knot, remove the minimum value from the PLQ function and update the coefficients
 
     Parameters
     ----------

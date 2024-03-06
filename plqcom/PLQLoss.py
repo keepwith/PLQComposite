@@ -13,34 +13,39 @@ from sympy import symbols, solve, Eq
 
 class PLQLoss(object):
     """
-    PLQLoss: continuous convex piecewise quandratic function (with a function converting to ReHLoss).
+    PLQLoss is a class represents a continuous convex piecewise quandratic function (with a function converting to ReHLoss).
 
     Parameters
     ----------
 
     quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
-        The quandratic coefficients in pieces of the PLQoss
+        The quandratic coefficients in pieces of the PLQoss.
         The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
-        The form of the input PLQ function
-        'plq' for the PLQ form,
-            In this form, cutpoints must be given explicitly
+        The form of the input PLQ function.
+
+        'plq' for the PLQ form
+            In this form, cutpoints must be given explicitly.
+
         'minimax' for the minimax form
             The minimax form is a special form of the PLQ function, which is the maximum of several quadratic functions.
             The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
 
     cutpoints : {array-like} of float, optional, default: None
         cutpoints of the PLQoss, except -np.inf and np.inf
+
         if the form is 'minimax', the cutpoints is not necessary
+
         if the form is 'plq', the cutpoints is necessary
 
-    Example
-    -------
+    Examples
+    --------
+
     >>> import numpy as np
     >>> cutpoints = [0., 1.]
     >>> quad_coef = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
-    >>> test_loss = PLQoss(quad_coef, cutpoints=cutpoints)
+    >>> test_loss = PLQLoss(quad_coef, cutpoints=cutpoints)
     >>> x = np.arange(-2,2,.05)
     >>> test_loss(x)
     """
@@ -91,9 +96,20 @@ class PLQLoss(object):
             self.min_knot = np.inf
 
     def __call__(self, x):
-        """ Evaluation of PLQLoss
+        """
+        Evaluation of PLQLoss function
 
-        out = quad_coef['a'][i]*x**2 + quad_coef['b'][i]*x + quad_coef['c'][i], if cutpoints[i] < x < cutpoints[i+1]
+        Parameters
+        ----------
+
+        x : array-like
+            The input data
+
+        Returns
+        -------
+
+        array-like
+             out = quad_coef['a'][i]*x**2 + quad_coef['b'][i]*x + quad_coef['c'][i], if cutpoints[i] < x < cutpoints[i+1]
         """
 
         x = np.array(x)
@@ -115,9 +131,7 @@ class PLQLoss(object):
             return y
 
     def minimax2plq(self, quad_coef):
-        """
-            convert the minimax form to the PLQ form
-        """
+        # convert the minimax form to the PLQ form
         solutions = np.array([])
         n_pieces = len(quad_coef['a'])
         x = symbols('x', real=True)
@@ -166,8 +180,7 @@ class PLQLoss(object):
         return new_quad_coef, new_cutpoints, new_n_pieces
 
     def _2ReHLoss(self):
-        """
-            convert the PLQ function to a ReHLoss function
+        """convert the PLQ function to a ReHLoss function
 
         :return:
             an object of ReHLoss

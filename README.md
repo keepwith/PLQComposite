@@ -6,6 +6,7 @@
 - [Links](#Links)
 - [Formulation](#Formulation)
   - [Decompose Stage](#Decompose_Stage)
+    - [A Decompose Example](#A-Decompose-Example)
   - [Broadcast Stage](#Broadcast_Stage)
 - [Core Modules](#Core-Modules)
   - [Class:PLQLoss](#ClassPLQLoss)
@@ -102,6 +103,75 @@ $$
 L(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{ReLU-ReHU} 
 $$
 
+#### A Decompose Example  
+Given a continous convex PLQ Loss function with the form $(a1)$ below  
+$$
+L(z)=
+\begin{cases}
+\ z^2 + 2z, & \text{if } z \leq -4, \\
+\ -2z, & \text{if } -4 < z \leq 0 \\
+\ 2z, & \text{if } 0 < z \leq 1 \\
+\ 2z^2 + 4z -4, & \text{if } 1 < z \leq 2 \\
+\ 24z -36, & \text{if } z > 2
+\end{cases}
+\tag{a1} 
+$$
+
+![](./figs/PLQLoss.png)
+
+**Separate it to left and right from the minimum point**  
+The minimum archived when $z=0$ and $L(z)=0$  
+Separate $L(z)$ from $z=0$ to $L_{left}(z)$ and $L_{right}(z)$ below
+$$
+L_{left}(z)=
+\begin{cases}
+\ z^2 + 2z, & \text{if } z \leq -4, \\
+\ -2z, & \text{if } -4 < z \leq 0 \\
+\ 0, & \text{if } z>0
+\end{cases}
+\tag{a2} 
+$$
+
+$$
+L_{right}(z)=
+\begin{cases}
+\ 0, & \text{if }  z \leq 0 \\
+\ 2z, & \text{if } 0 < z \leq 1 \\
+\ 2z^2 + 4z -4, & \text{if } 1 < z \leq 2 \\
+\ 24z -36, & \text{if } z > 2
+\end{cases}
+\tag{a3} 
+$$
+
+![](./figs/Left_Right.png)
+
+**Decompose to ReLU-ReHU piecewisely**
+For the $L_{right(z)}$ in $(a3)$  
+Work from each cutpoints from left to right, remove a tangent line from left then we have  
+
+$$
+\begin{eqnarray} 
+g_{right,i}(z) &=& L_{right,i}(z) -(L_{right,i-1}^{\prime}(z_{i-1})(z-z_{i-1})+L_{right,i-1}(z_{i-1})) \\
+			  &=& a_{i}z^2 + b_{i}z + c_{i} - \left[ (2a_{i-1}z_{i-1}+b_{i-1})(z-z_{i-1}) + a_{i}z_{i-1}^2+b_i z_{i-1} + c_i \right] \\
+			  &=& \frac{(\sqrt{2a_i}z-\sqrt{2a_i}z_{i-1})^2}{2} + \left[ 2z_{i-1}(a_{i}-a_{i-1}+(b_{i}-b_{i-1})\right](z-z_{i-1})
+\end{eqnarray}
+\tag{a4}
+$$
+
+where $z_{i-1}$ is the cutpoints, $a_i,b_i,c_i,a_{i-1},b_{i-1},c_{i-1}$ are the coefficients of piece $i$ and $i-1$  
+We can know that the first term is a **ReHU** and the second term is a **ReLU**。
+$g_{right,1}(z)=2z=ReLU(2z)$  
+$g_{right,2}(z)=2z^2+2z-4=ReLU(6z - 6) + ReHU_{2}(2z-2)$  
+$g_{right,3}(z)=12z-24=ReLU(12z - 24)$  
+
+For the the $L_{left(z)}$ in $(a2)$
+Work from each cutpoints from right to left, remove a tangent line from right then we will get similar result.
+$g_{left,1}(z)=-2z=ReLU(-2z)$  
+$g_{left,2}(z)=z^2+4z=ReLU(6z - 6) + ReHU_{2}(2z-2)$ 
+
+Then we will get a $(ReLU-ReHU)$ form of $L(z)$  
+
+![](./figs/ReLU_ReHU.png)
 
 ### Broadcast Stage
 In broadcast stage, then main task is to broadcast the $L(z)$ with the form $(ReLU-ReHU)$ in decompose stage to all the data points. i.e. generate $L_i(z_i)$ from the $L(z)$ above.
@@ -182,11 +252,11 @@ from plqcom.PLQLoss import PLQLoss
 # create type 1 (plq)
 cutpoints_1 = np.array([0., 1.])
 quad_coef_1 = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
-plq_loss_1 = PLQoss(quad_coef_1, cutpoints=cutpoints_1, form="plq")
+plq_loss_1 = PLQLoss(quad_coef_1, cutpoints=cutpoints_1, form="plq")
 
 # create type 2 (minimax)
 quad_coef_2 = {'a': np.array([0., 0., 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([-1., 0., -1.])}
-plq_loss_2 = PLQoss(quad_coef_2, form="minimax")
+plq_loss_2 = PLQLoss(quad_coef_2, form="minimax")
 
 # You can also evaluate the plqloss directly
 x = np.arange(-2,2,.05)

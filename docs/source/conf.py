@@ -18,14 +18,15 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PLQComposite Decomposition'
-copyright = '2024, "Tingxian Gao"'
-author = '"Tingxian Gao"'
+copyright = '2024, Tingxian Gao'
+author = 'Tingxian Gao'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
 
-import os, sys
-import sphinx_rtd_theme
+import os
+import sys
+import renku_sphinx_theme
 
 sys.path.append('.')
 
@@ -39,13 +40,21 @@ sys.path.insert(0, os.path.abspath('../../plqcom'))
 # ones.
 master_doc = 'index'
 extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
+    'autoapi.extension',
+    # "sphinx.ext.linkcode",
+    # "sphinx.ext.intersphinx",
+    "sphinx_autodoc_typehints",
     'sphinx.ext.autosummary',
-    'numpydoc'
+    'numpydoc',
+    'nbsphinx'
 ]
 autoapi_dirs = ['../../plqcom']
+autosummary_generate = True
+numpydoc_show_class_members = False
+nbsphinx_execute = 'never'
+nbsphinx_allow_errors = True
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -59,8 +68,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = 'renku'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
