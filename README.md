@@ -104,7 +104,8 @@ L(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\
 $$
 
 #### A Decompose Example  
-Given a continous convex PLQ Loss function with the form $(a1)$ below  
+Given a continous convex PLQ Loss function with the form $(a1)$ below 
+
 $$
 L(z)=
 \begin{cases}
@@ -122,6 +123,7 @@ $$
 **Separate it to left and right from the minimum point**  
 The minimum archived when $z=0$ and $L(z)=0$  
 Separate $L(z)$ from $z=0$ to $L_{left}(z)$ and $L_{right}(z)$ below
+
 $$
 L_{left}(z)=
 \begin{cases}
@@ -153,7 +155,7 @@ $$
 \begin{eqnarray} 
 g_{right,i}(z) &=& L_{right,i}(z) -(L_{right,i-1}^{\prime}(z_{i-1})(z-z_{i-1})+L_{right,i-1}(z_{i-1})) \\
 			  &=& a_{i}z^2 + b_{i}z + c_{i} - \left[ (2a_{i-1}z_{i-1}+b_{i-1})(z-z_{i-1}) + a_{i}z_{i-1}^2+b_i z_{i-1} + c_i \right] \\
-			  &=& \frac{(\sqrt{2a_i}z-\sqrt{2a_i}z_{i-1})^2}{2} + \left[ 2z_{i-1}(a_{i}-a_{i-1}+(b_{i}-b_{i-1})\right](z-z_{i-1})
+			  &=& \frac{(\sqrt{2a_i}z-\sqrt{2a_i}z_{i-1})^2}{2} + \left[ 2z_{i-1}(a_{i}-a_{i-1}+(b_{i}-b_{i-1})\right] (z-z_{i-1})
 \end{eqnarray}
 \tag{a4}
 $$
