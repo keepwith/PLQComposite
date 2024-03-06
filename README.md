@@ -161,13 +161,13 @@ g_{right,i}(z) &=& L_{right,i}(z) -(L_{right,i-1}^{\prime}(z_{i-1})(z-z_{i-1})+L
 $$
 
 where $z_{i-1}$ is the cutpoints, $a_i,b_i,c_i,a_{i-1},b_{i-1},c_{i-1}$ are the coefficients of piece $i$ and $i-1$  
-We can know that the first term is a **ReHU** and the second term is a **ReLU**。
+We can know that the first term is a **ReHU** and the second term is a **ReLU**.  
 $g_{right,1}(z)=2z=ReLU(2z)$  
 $g_{right,2}(z)=2z^2+2z-4=ReLU(6z - 6) + ReHU_{2}(2z-2)$  
 $g_{right,3}(z)=12z-24=ReLU(12z - 24)$  
 
 For the the $L_{left(z)}$ in $(a2)$
-Work from each cutpoints from right to left, remove a tangent line from right then we will get similar result.
+Work from each cutpoints from right to left, remove a tangent line from right then we will get similar result.  
 $g_{left,1}(z)=-2z=ReLU(-2z)$  
 $g_{left,2}(z)=z^2+4z=ReLU(6z - 6) + ReHU_{2}(2z-2)$ 
 
