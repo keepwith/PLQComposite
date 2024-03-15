@@ -9,13 +9,13 @@
 		```
 		$ git clone https://github.com/keepwith/PLQComposite.git
 		```
-- Technical Details: [technical_details.pdf](https://github.com/keepwith/PLQComposite/docs/technical_details.pdf)   
+- Technical Details: [technical_details.pdf](https://github.com/keepwith/PLQComposite/blob/main/docs/technical_details.pdf)   
 
 
 ## Contents
 - [Introduction](#Introduction)
 - [Usage](#Usage)
-- [Examples](#Examples and Notebooks)
+- [Examples](#Examples_and_Notebooks)
 - [References](#References)
 
 
