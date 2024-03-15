@@ -47,7 +47,8 @@ extensions = [
     "sphinx_autodoc_typehints",
     'sphinx.ext.autosummary',
     'numpydoc',
-    'nbsphinx'
+    'nbsphinx',
+    'sphinx_gallery.load_style',
 ]
 autoapi_dirs = ['../../plqcom']
 autosummary_generate = True

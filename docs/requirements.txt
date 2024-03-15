@@ -13,3 +13,5 @@ numpydoc
 sphinx_theme_pd
 sphinx_autodoc_typehints
 sphinx-press-theme
+sphinx_gallery
+pandoc
