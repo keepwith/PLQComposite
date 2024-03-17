@@ -92,6 +92,7 @@ $$
 
 **Create a PLQ Loss**  
 ```python
+import numpy as np
 from plqcom.PLQLoss import PLQLoss
 plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='minimax')
 ```
