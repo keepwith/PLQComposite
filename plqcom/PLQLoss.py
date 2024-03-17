@@ -6,8 +6,6 @@
 # License: MIT License
 
 import numpy as np
-from plqcom import PLQProperty
-from rehline._loss import ReHLoss
 from sympy import symbols, solve, Eq
 
 
@@ -74,7 +72,7 @@ class PLQLoss(object):
 
         # minimax form input
         if form == "minimax":
-            self.quad_coef, self.cutpoints, self.n_pieces = self.minimax2plq(quad_coef)
+            self.quad_coef, self.cutpoints, self.n_pieces = self.minimax_to_plq(quad_coef)
             self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
             self.min_val = np.inf
             self.min_knot = np.inf
@@ -130,7 +128,7 @@ class PLQLoss(object):
         else:
             return y
 
-    def minimax2plq(self, quad_coef):
+    def minimax_to_plq(self, quad_coef):
         # convert the minimax form to the PLQ form
         solutions = np.array([])
         n_pieces = len(quad_coef['a'])
@@ -179,96 +177,4 @@ class PLQLoss(object):
 
         return new_quad_coef, new_cutpoints, new_n_pieces
 
-    def _2ReHLoss(self):
-        """convert the PLQ function to a ReHLoss function
 
-        :return:
-            an object of ReHLoss
-        """
-
-        # check the continuity and convexity of the PLQ function
-        if not PLQProperty.is_continuous(self):
-            print("The PLQ function is not continuous!")
-            exit()
-
-        if not PLQProperty.is_convex(self):
-            print("The PLQ function is not convex!")
-            exit()
-
-        # check the cutoff of each piece
-        PLQProperty.check_cutoff(self)
-
-        # find the minimum value and knot
-        PLQProperty.find_min(self)
-
-        relu_coef, relu_intercept = [], []
-        rehu_coef, rehu_intercept, rehu_cut = [], [], []
-        quad_coef = self.quad_coef.copy()
-        cutpoints = self.cutpoints.copy()
-
-        # remove a ReLU/ReHU function from this point; i-th point -> i-th or (i+1)-th interval
-        ind_tmp = self.min_knot
-
-        # Right
-        # first interval on the right
-        # + relu
-        temp = 2 * quad_coef['a'][ind_tmp] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp]
-        if temp != 0:
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[ind_tmp])
-
-        if quad_coef['a'][ind_tmp] != 0:
-            # +rehu
-            rehu_coef.append(np.sqrt(2 * quad_coef['a'][ind_tmp]))
-            rehu_intercept.append(-np.sqrt(2 * quad_coef['a'][ind_tmp]) * cutpoints[ind_tmp])
-            rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp]) * (cutpoints[ind_tmp + 1] - cutpoints[ind_tmp]))
-
-        # other intervals on the right
-        for i in range(ind_tmp + 1, len(cutpoints) - 1):
-            # +relu
-            temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i - 1]) * cutpoints[i] + (
-                    quad_coef['b'][i] - quad_coef['b'][i - 1])
-            if temp != 0:
-                relu_coef.append(temp)
-                relu_intercept.append(-temp * cutpoints[i])
-
-            if quad_coef['a'][i] != 0:
-                # +rehu
-                rehu_coef.append(np.sqrt(2 * quad_coef['a'][i]))
-                rehu_intercept.append(-np.sqrt(2 * quad_coef['a'][i]) * cutpoints[i])
-                rehu_cut.append(np.sqrt(2 * quad_coef['a'][i]) * (cutpoints[i + 1] - cutpoints[i]))
-
-        # Left
-        # first interval on the left
-        # + relu
-        temp = 2 * quad_coef['a'][ind_tmp - 1] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp - 1]
-        if temp != 0:
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[ind_tmp])
-
-        if quad_coef['a'][ind_tmp - 1] != 0:
-            # +rehu
-            rehu_coef.append(-np.sqrt(2 * quad_coef['a'][ind_tmp - 1]))
-            rehu_intercept.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * cutpoints[ind_tmp])
-            rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * (cutpoints[ind_tmp] - cutpoints[ind_tmp - 1]))
-
-        # other intervals on the left
-        for i in range(0, ind_tmp - 1):
-            # +relu
-            temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i + 1]) * cutpoints[i + 1] + (
-                    quad_coef['b'][i] - quad_coef['b'][i + 1])
-            if temp != 0:
-                relu_coef.append(temp)
-                relu_intercept.append(-temp * cutpoints[i + 1])
-
-            if quad_coef['a'][i] != 0:
-                # +rehu
-                rehu_coef.append(-np.sqrt(2 * quad_coef['a'][i]))
-                rehu_intercept.append(np.sqrt(2 * quad_coef['a'][i]) * cutpoints[i + 1])
-                rehu_cut.append(np.sqrt(2 * quad_coef['a'][i]) * (cutpoints[i + 1] - cutpoints[i]))
-
-        return ReHLoss(relu_coef=np.array(relu_coef).reshape((-1, 1)),
-                       relu_intercept=np.array(relu_intercept).reshape((-1, 1)),
-                       rehu_coef=np.array(rehu_coef).reshape((-1, 1)),
-                       rehu_intercept=np.array(rehu_intercept).reshape((-1, 1)),
-                       rehu_cut=np.array(rehu_cut).reshape((-1, 1)))

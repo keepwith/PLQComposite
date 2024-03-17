@@ -1,4 +1,5 @@
 from plqcom.PLQLoss import PLQLoss
+from plqcom.PLQProperty import plq_to_rehloss
 from plqcom.ReHProperty import affine_transformation
 
 # test SVM on simulated dataset
@@ -37,7 +38,7 @@ def svm_test():
 
     plqloss = PLQLoss(quad_coef={'a': np.array([0., 0.]), 'b': np.array([0., 1.]), 'c': np.array([0., 0.])},
                       cutpoints=np.array([0]))
-    rehloss = plqloss._2ReHLoss()
+    rehloss = plq_to_rehloss(plqloss)
     rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
     clf_3 = ReHLine(loss={'name': 'custom'}, C=C)
     clf_3.U, clf_3.V = rehloss.relu_coef, rehloss.relu_intercept
@@ -82,7 +83,7 @@ def ssvm_test():
     plqloss = PLQLoss(
         quad_coef={'a': np.array([0., 0.5, 0.]), 'b': np.array([0., 0., 1]), 'c': np.array([0., 0., -0.5])},
         cutpoints=np.array([0., 1.]))
-    rehloss = plqloss._2ReHLoss()
+    rehloss = plq_to_rehloss(plqloss)
     rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
     clf_3 = ReHLine(loss={'name': 'custom'}, C=C)
     clf_3.S, clf_3.T, clf_3.Tau = rehloss.rehu_coef, rehloss.rehu_intercept, rehloss.rehu_cut
