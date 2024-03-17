@@ -182,65 +182,48 @@ def plq_to_rehloss(plq_loss):
     ind_tmp = plq_loss.min_knot
 
     # Right
-    # first interval on the right
-    # + relu
-    temp = 2 * quad_coef['a'][ind_tmp] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp]
-    if temp != 0:
-        relu_coef.append(temp)
-        relu_intercept.append(-temp * cutpoints[ind_tmp])
+    cutpoints_r = cutpoints[ind_tmp:]
+    quad_coef_r = {'a': quad_coef['a'][ind_tmp:], 'b': quad_coef['b'][ind_tmp:], 'c': quad_coef['c'][ind_tmp:]}
+    # +relu
+    relu_coef_r = 2 * np.diff(quad_coef_r['a'], prepend=0) * cutpoints_r[:-1] + np.diff(
+        quad_coef_r['b'], prepend=0)
+    relu_intercept_r = -relu_coef_r * cutpoints_r[:-1]
 
-    if quad_coef['a'][ind_tmp] != 0:
-        # +rehu
-        rehu_coef.append(np.sqrt(2 * quad_coef['a'][ind_tmp]))
-        rehu_intercept.append(-np.sqrt(2 * quad_coef['a'][ind_tmp]) * cutpoints[ind_tmp])
-        rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp]) * (cutpoints[ind_tmp + 1] - cutpoints[ind_tmp]))
+    relu_intercept_r = relu_intercept_r[relu_coef_r != 0]
+    relu_coef_r = relu_coef_r[relu_coef_r != 0]
 
-    # other intervals on the right
-    for i in range(ind_tmp + 1, len(cutpoints) - 1):
-        # +relu
-        temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i - 1]) * cutpoints[i] + (
-                quad_coef['b'][i] - quad_coef['b'][i - 1])
-        if temp != 0:
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[i])
+    # +rehu
+    rehu_coef_r = np.sqrt(2 * quad_coef_r['a'])
+    rehu_intercept_r = -np.sqrt(2 * quad_coef_r['a']) * cutpoints_r[:-1]
+    rehu_cut_r = np.sqrt(2 * quad_coef_r['a'] * np.diff(cutpoints_r))
 
-        if quad_coef['a'][i] != 0:
-            # +rehu
-            rehu_coef.append(np.sqrt(2 * quad_coef['a'][i]))
-            rehu_intercept.append(-np.sqrt(2 * quad_coef['a'][i]) * cutpoints[i])
-            rehu_cut.append(np.sqrt(2 * quad_coef['a'][i]) * (cutpoints[i + 1] - cutpoints[i]))
+    rehu_intercept_r = rehu_intercept_r[rehu_coef_r != 0]
+    rehu_cut_r = rehu_cut_r[rehu_coef_r != 0]
+    rehu_coef_r = rehu_coef_r[rehu_coef_r != 0]
 
     # Left
-    # first interval on the left
-    # + relu
-    temp = 2 * quad_coef['a'][ind_tmp - 1] * cutpoints[ind_tmp] + quad_coef['b'][ind_tmp - 1]
-    if temp != 0:
-        relu_coef.append(temp)
-        relu_intercept.append(-temp * cutpoints[ind_tmp])
+    cutpoints_l = np.flip(cutpoints[:ind_tmp + 1])
+    quad_coef_l = {'a': np.flip(quad_coef['a'][:ind_tmp]), 'b': np.flip(quad_coef['b'][:ind_tmp]),
+                   'c': np.flip(quad_coef['c'][:ind_tmp])}
+    # +relu
+    relu_coef_l = 2 * np.diff(quad_coef_l['a'], prepend=0) * cutpoints_l[:-1] + np.diff(
+        quad_coef_l['b'], prepend=0)
+    relu_intercept_l = -relu_coef_l * cutpoints_l[:-1]
 
-    if quad_coef['a'][ind_tmp - 1] != 0:
-        # +rehu
-        rehu_coef.append(-np.sqrt(2 * quad_coef['a'][ind_tmp - 1]))
-        rehu_intercept.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * cutpoints[ind_tmp])
-        rehu_cut.append(np.sqrt(2 * quad_coef['a'][ind_tmp - 1]) * (cutpoints[ind_tmp] - cutpoints[ind_tmp - 1]))
+    relu_intercept_l = relu_intercept_l[relu_coef_l != 0]
+    relu_coef_l = relu_coef_l[relu_coef_l != 0]
 
-    # other intervals on the left
-    for i in range(0, ind_tmp - 1):
-        # +relu
-        temp = 2 * (quad_coef['a'][i] - quad_coef['a'][i + 1]) * cutpoints[i + 1] + (
-                quad_coef['b'][i] - quad_coef['b'][i + 1])
-        if temp != 0:
-            relu_coef.append(temp)
-            relu_intercept.append(-temp * cutpoints[i + 1])
+    # +rehu
+    rehu_coef_l = -np.sqrt(2 * quad_coef_l['a'])
+    rehu_intercept_l = np.sqrt(2 * quad_coef_l['a']) * cutpoints_l[:-1]
+    rehu_cut_l = np.sqrt(2 * quad_coef_l['a'] * (cutpoints_l[:-1] - cutpoints_l[1:]))
 
-        if quad_coef['a'][i] != 0:
-            # +rehu
-            rehu_coef.append(-np.sqrt(2 * quad_coef['a'][i]))
-            rehu_intercept.append(np.sqrt(2 * quad_coef['a'][i]) * cutpoints[i + 1])
-            rehu_cut.append(np.sqrt(2 * quad_coef['a'][i]) * (cutpoints[i + 1] - cutpoints[i]))
+    rehu_intercept_l = rehu_intercept_l[rehu_coef_l != 0]
+    rehu_cut_l = rehu_cut_l[rehu_coef_l != 0]
+    rehu_coef_l = rehu_coef_l[rehu_coef_l != 0]
 
-    return ReHLoss(relu_coef=np.array(relu_coef).reshape((-1, 1)),
-                   relu_intercept=np.array(relu_intercept).reshape((-1, 1)),
-                   rehu_coef=np.array(rehu_coef).reshape((-1, 1)),
-                   rehu_intercept=np.array(rehu_intercept).reshape((-1, 1)),
-                   rehu_cut=np.array(rehu_cut).reshape((-1, 1)))
+    return ReHLoss(relu_coef=np.concatenate((relu_coef_l, relu_coef_r)).reshape((-1, 1)),
+                   relu_intercept=np.concatenate((relu_intercept_l, relu_intercept_r)).reshape((-1, 1)),
+                   rehu_coef=np.concatenate((rehu_coef_l, rehu_coef_r)).reshape((-1, 1)),
+                   rehu_intercept=np.concatenate((rehu_intercept_l, rehu_intercept_r)).reshape((-1, 1)),
+                   rehu_cut=np.concatenate((rehu_cut_l, rehu_cut_r)).reshape((-1, 1)))
