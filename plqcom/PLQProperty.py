@@ -5,7 +5,7 @@
 # License: MIT License
 
 import numpy as np
-from plqcom import PLQLoss
+from plqcom.PLQLoss import PLQLoss
 from rehline import ReHLoss
 
 

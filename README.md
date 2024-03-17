@@ -15,7 +15,7 @@
 ## Contents
 - [Introduction](#Introduction)
 - [Usage](#Usage)
-- [Examples](#Examples_and_Notebooks)
+- [Examples](#Examples-and-Notebooks)
 - [References](#References)
 
 
@@ -92,12 +92,14 @@ $$
 
 **Create a PLQ Loss**  
 ```python
+from plqcom.PLQLoss import PLQLoss
 plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='minimax')
 ```
 
-Then just **call its _2ReHLoss** method to decompose it to form $(2)$  
+Then call **plq_to_rehloss** method to decompose it to form $(2)$  
 ```python
-rehloss = plqloss._2ReHLoss()
+from plqcom.PLQProperty import plq_to_rehloss
+rehloss = plq_to_rehloss(plqloss)
 ```
 
 ### 2) Broadcast to all Samples
