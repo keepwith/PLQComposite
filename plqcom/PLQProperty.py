@@ -27,18 +27,21 @@ def is_continuous(plq_loss):
     >>> PLQProperty.is_continuous(plq_loss)
     >>> True
     """
+
     cutpoints = plq_loss.cutpoints[1:-1].copy()
     quad_coef = plq_loss.quad_coef.copy()
-    n_pieces = plq_loss.n_pieces
 
-    # check the continuity at cut points from left to right
-    for i in range(n_pieces - 1):
-        if (quad_coef['a'][i] * (cutpoints[i] ** 2) + quad_coef['b'][i] *
-            cutpoints[i] + quad_coef['c'][i]) - (quad_coef['a'][i + 1] *
-                                                 (cutpoints[i] ** 2) + quad_coef['b'][i + 1] * cutpoints[i] +
-                                                 quad_coef['c'][i + 1]) > 1e-6:
-            return False
+    # only one piece
+    if plq_loss.n_pieces == 1:
+        return True
 
+    diff_max = np.max(
+        np.diff(quad_coef['a']) * (cutpoints ** 2) + np.diff(quad_coef['b']) * cutpoints + np.diff(quad_coef['c']))
+    diff_min = np.min(
+        np.diff(quad_coef['a']) * (cutpoints ** 2) + np.diff(quad_coef['b']) * cutpoints + np.diff(quad_coef['c']))
+
+    if diff_max > 1e-6 or diff_min < -1e-6:
+        return False
     return True
 
 
@@ -66,11 +69,13 @@ def is_convex(plq_loss):
     if np.min(plq_loss.quad_coef['a']) < 0:
         return False
 
-    # compare the first order derivatives at cut points
-    for i in range(plq_loss.n_pieces - 1):
-        if (2 * plq_loss.quad_coef['a'][i] * plq_loss.cutpoints[i + 1] + plq_loss.quad_coef['b'][i] >
-                2 * plq_loss.quad_coef['a'][i + 1] * plq_loss.cutpoints[i + 1] + plq_loss.quad_coef['b'][i + 1]):
-            return False
+    # only one piece
+    if plq_loss.n_pieces == 1:
+        return True
+
+    # check the minimum value of $2(a_i - a_{i-1}) * x_{i-1} + (b_i - b_{i-1})$
+    if np.min(2 * np.diff(plq_loss.quad_coef['a']) * plq_loss.cutpoints[1:-1] + np.diff(plq_loss.quad_coef['b'])) < 0:
+        return False
 
     return True
 
