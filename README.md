@@ -107,10 +107,12 @@ Usually, there exists a special relationship between each $L_{i}$
 $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})$$  
 Call **affine_transformation** method to broadcast
 ```python
+from plqcom.ReHProperty import affine_transformation
 rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
 ```
 ### 3) Use Rehline solve the problem
 ```
+from rehline import ReHLine
 clf = ReHLine(loss={'name': 'custom'}, C=C)
 clf.U, clf.V, clf.Tau, clf.S, clf.T= rehloss.relu_coef, rehloss.relu_intercept,rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
 clf.fit(X=X)
