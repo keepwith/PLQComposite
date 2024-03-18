@@ -144,7 +144,9 @@ def find_min(plq_loss):
     >>> 1
     """
     # find the minimum value and knot
-    out_cut = plq_loss(plq_loss.cutpoints[1:-1])
+    out_cut = plq_loss.quad_coef['a'][:-1] * plq_loss.cutpoints[1:-1] ** 2 + (
+                plq_loss.quad_coef['b'][:-1] * plq_loss.cutpoints[1:-1] + plq_loss.quad_coef['c'][:-1])
+    # out_cut = plq_loss(plq_loss.cutpoints[1:-1])
     plq_loss.min_val = np.min(out_cut)
     plq_loss.min_knot = np.argmin(out_cut) + 1
     # remove self.min_val from the PLQ function
