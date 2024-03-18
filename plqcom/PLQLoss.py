@@ -6,7 +6,7 @@
 # License: MIT License
 
 import numpy as np
-from sympy import symbols, solve, Eq
+import itertools
 
 
 class PLQLoss(object):
@@ -130,18 +130,19 @@ class PLQLoss(object):
 
     def minimax_to_plq(self, quad_coef):
         # convert the minimax form to the PLQ form
-        solutions = np.array([])
-        n_pieces = len(quad_coef['a'])
-        x = symbols('x', real=True)
-        for i in range(n_pieces):
-            for j in range(i + 1, n_pieces):
-                solutions = np.append(solutions,
-                                      solve(Eq(quad_coef['a'][i] * x ** 2 + quad_coef['b'][i] * x + quad_coef['c'][i],
-                                               quad_coef['a'][j] * x ** 2 + quad_coef['b'][j] * x + quad_coef['c'][j]),
-                                            x))
 
-        solutions = list(set(solutions.tolist()))  # remove the duplicate solutions
-        cutpoints = np.sort(np.array(solutions, dtype=float))
+        diff_a = np.diff(np.array(list(itertools.combinations(quad_coef['a'], 2))))
+        diff_b = np.diff(np.array(list(itertools.combinations(quad_coef['b'], 2))))
+        diff_c = np.diff(np.array(list(itertools.combinations(quad_coef['c'], 2))))
+        index_1 = np.logical_and(diff_a == 0, diff_b != 0)
+        sol1 = -diff_c[index_1] / diff_b[index_1]
+        index_2 = np.logical_and(diff_a != 0, diff_b * diff_b - 4 * diff_a * diff_c >= 0)
+        sol2 = (-diff_b[index_2] + np.sqrt(
+            diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
+        sol3 = (-diff_b[index_2] - np.sqrt(
+            diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
+        # remove duplicate solutions
+        cutpoints = np.sort(np.array(list(set(np.concatenate((sol1, sol2, sol3)).tolist())), dtype=float))
 
         if len(cutpoints) == 0:
             ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x = 0
@@ -171,10 +172,7 @@ class PLQLoss(object):
                     cutpoints = np.delete(cutpoints, i)
                 else:
                     i += 1
-
             new_cutpoints = cutpoints
             new_n_pieces = len(new_quad_coef['a'])
 
         return new_quad_coef, new_cutpoints, new_n_pieces
-
-
