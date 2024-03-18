@@ -1,6 +1,6 @@
 """ PLQLoss: Piecewise Linear Quadratic Loss function, with Decomposition to ReLU-ReHU Composition Loss functions """
 
-# Author: Tingxian Gao <txgao@cuhk.edu.hk>
+# Author: Tingxian Gao <txgao@link.cuhk.edu.hk>
 #         Ben Dai <bendai@cuhk.edu.hk>
 
 # License: MIT License
