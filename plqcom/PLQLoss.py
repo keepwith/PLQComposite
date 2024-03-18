@@ -11,7 +11,8 @@ import itertools
 
 class PLQLoss(object):
     """
-    PLQLoss is a class represents a continuous convex piecewise quandratic function (with a function converting to ReHLoss).
+    PLQLoss is a class represents a continuous convex piecewise quandratic function (with a function converting to
+    ReHLoss).
 
     Parameters
     ----------
@@ -72,7 +73,7 @@ class PLQLoss(object):
 
         # minimax form input
         if form == "minimax":
-            self.quad_coef, self.cutpoints, self.n_pieces = self.minimax_to_plq(quad_coef)
+            self.quad_coef, self.cutpoints, self.n_pieces = minimax_to_plq(quad_coef)
             self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
             self.min_val = np.inf
             self.min_knot = np.inf
@@ -128,51 +129,52 @@ class PLQLoss(object):
         else:
             return y
 
-    def minimax_to_plq(self, quad_coef):
-        # convert the minimax form to the PLQ form
 
-        diff_a = np.diff(np.array(list(itertools.combinations(quad_coef['a'], 2))))
-        diff_b = np.diff(np.array(list(itertools.combinations(quad_coef['b'], 2))))
-        diff_c = np.diff(np.array(list(itertools.combinations(quad_coef['c'], 2))))
-        index_1 = np.logical_and(diff_a == 0, diff_b != 0)
-        sol1 = -diff_c[index_1] / diff_b[index_1]
-        index_2 = np.logical_and(diff_a != 0, diff_b * diff_b - 4 * diff_a * diff_c >= 0)
-        sol2 = (-diff_b[index_2] + np.sqrt(
-            diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
-        sol3 = (-diff_b[index_2] - np.sqrt(
-            diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
-        # remove duplicate solutions
-        cutpoints = np.sort(np.array(list(set(np.concatenate((sol1, sol2, sol3)).tolist())), dtype=float))
+def minimax_to_plq(quad_coef):
+    # convert the minimax form to the PLQ form
 
-        if len(cutpoints) == 0:
-            ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x = 0
-            new_quad_coef = {'a': np.array([quad_coef['a'][ind_tmp]]), 'b': np.array([quad_coef['b'][ind_tmp]]),
-                             'c': np.array([quad_coef['c'][ind_tmp]])}
-            new_cutpoints = np.array([])
-            new_n_pieces = 1
-        else:
-            evals = (cutpoints[:-1] + cutpoints[1:]) / 2
-            evals = np.concatenate(([-1 + cutpoints[0]], evals, [1 + cutpoints[-1]]))
-            new_quad_coef = {'a': np.array([]), 'b': np.array([]), 'c': np.array([])}
-            for i in range(len(evals)):
-                ind_tmp = np.argmax(quad_coef['a'] * evals[i] ** 2 + quad_coef['b'] * evals[i] + quad_coef['c'])
-                new_quad_coef['a'] = np.append(new_quad_coef['a'], quad_coef['a'][ind_tmp])
-                new_quad_coef['b'] = np.append(new_quad_coef['b'], quad_coef['b'][ind_tmp])
-                new_quad_coef['c'] = np.append(new_quad_coef['c'], quad_coef['c'][ind_tmp])
+    diff_a = np.diff(np.array(list(itertools.combinations(quad_coef['a'], 2))))
+    diff_b = np.diff(np.array(list(itertools.combinations(quad_coef['b'], 2))))
+    diff_c = np.diff(np.array(list(itertools.combinations(quad_coef['c'], 2))))
+    index_1 = np.logical_and(diff_a == 0, diff_b != 0)
+    sol1 = -diff_c[index_1] / diff_b[index_1]
+    index_2 = np.logical_and(diff_a != 0, diff_b * diff_b - 4 * diff_a * diff_c >= 0)
+    sol2 = (-diff_b[index_2] + np.sqrt(
+        diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
+    sol3 = (-diff_b[index_2] - np.sqrt(
+        diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
+    # remove duplicate solutions
+    cutpoints = np.sort(np.array(list(set(np.concatenate((sol1, sol2, sol3)).tolist())), dtype=float))
 
-            # merge the successive intervals with the same coefficients
-            i = 0
-            while i < len(new_quad_coef['a']) - 1:
-                if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and
-                        new_quad_coef['b'][i] == new_quad_coef['b'][i + 1] and
-                        new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
-                    new_quad_coef['a'] = np.delete(new_quad_coef['a'], i + 1)
-                    new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
-                    new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
-                    cutpoints = np.delete(cutpoints, i)
-                else:
-                    i += 1
-            new_cutpoints = cutpoints
-            new_n_pieces = len(new_quad_coef['a'])
+    if len(cutpoints) == 0:
+        ind_tmp = np.argmax(quad_coef['c'])  # just compare the function value at x = 0
+        new_quad_coef = {'a': np.array([quad_coef['a'][ind_tmp]]), 'b': np.array([quad_coef['b'][ind_tmp]]),
+                         'c': np.array([quad_coef['c'][ind_tmp]])}
+        new_cutpoints = np.array([])
+        new_n_pieces = 1
+    else:
+        evals = (cutpoints[:-1] + cutpoints[1:]) / 2
+        evals = np.concatenate(([-1 + cutpoints[0]], evals, [1 + cutpoints[-1]]))
+        new_quad_coef = {'a': np.array([]), 'b': np.array([]), 'c': np.array([])}
+        for i in range(len(evals)):
+            ind_tmp = np.argmax(quad_coef['a'] * evals[i] ** 2 + quad_coef['b'] * evals[i] + quad_coef['c'])
+            new_quad_coef['a'] = np.append(new_quad_coef['a'], quad_coef['a'][ind_tmp])
+            new_quad_coef['b'] = np.append(new_quad_coef['b'], quad_coef['b'][ind_tmp])
+            new_quad_coef['c'] = np.append(new_quad_coef['c'], quad_coef['c'][ind_tmp])
 
-        return new_quad_coef, new_cutpoints, new_n_pieces
+        # merge the successive intervals with the same coefficients
+        i = 0
+        while i < len(new_quad_coef['a']) - 1:
+            if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and
+                    new_quad_coef['b'][i] == new_quad_coef['b'][i + 1] and
+                    new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
+                new_quad_coef['a'] = np.delete(new_quad_coef['a'], i + 1)
+                new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
+                new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
+                cutpoints = np.delete(cutpoints, i)
+            else:
+                i += 1
+        new_cutpoints = cutpoints
+        new_n_pieces = len(new_quad_coef['a'])
+
+    return new_quad_coef, new_cutpoints, new_n_pieces

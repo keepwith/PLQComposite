@@ -18,9 +18,9 @@ setup(
     url="https://github.com/keepwith/PLQComposite",
     description="Piecewise Linear Quadratic Function Decomposition to Regularized Composite ReLU-ReHU Loss",
     packages=["plqcom"],
-    install_requires=["requests", "numpy", "rehline", "sympy"],
+    install_requires=["requests", "numpy", "rehline"],
     # extras_require={"test": "pytest"},
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.10",
+    python_requires=">=3.8",
 )

@@ -3,7 +3,6 @@ numpy
 rehline
 unittest
 pandas
-sympy
 scipy
 setuptools
 Sphinx
