@@ -27,14 +27,14 @@ class PLQLoss(object):
         'plq' for the PLQ form
             In this form, cutpoints must be given explicitly.
 
-        'minimax' for the minimax form
-            The minimax form is a special form of the PLQ function, which is the maximum of several quadratic functions.
+        'max' for the max form
+            The max form is a special form of the PLQ function, which is the pointwise maximum of several quadratic functions.
             The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
 
     cutpoints : {array-like} of float, optional, default: None
         cutpoints of the PLQoss, except -np.inf and np.inf
 
-        if the form is 'minimax', the cutpoints is not necessary
+        if the form is 'max', the cutpoints is not necessary
 
         if the form is 'plq', the cutpoints is necessary
 
@@ -67,13 +67,13 @@ class PLQLoss(object):
             exit()
 
         # check the input form
-        if form not in ['plq', 'minimax']:
+        if form not in ['plq', 'max']:
             print("The input form of PLQ function is not supported!")
             exit()
 
-        # minimax form input
-        if form == "minimax":
-            self.quad_coef, self.cutpoints, self.n_pieces = minimax_to_plq(quad_coef)
+        # max form input
+        if form == "max":
+            self.quad_coef, self.cutpoints, self.n_pieces = max_to_plq(quad_coef)
             self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
             self.min_val = np.inf
             self.min_knot = np.inf
@@ -130,8 +130,8 @@ class PLQLoss(object):
             return y
 
 
-def minimax_to_plq(quad_coef):
-    # convert the minimax form to the PLQ form
+def max_to_plq(quad_coef):
+    # convert the max form to the PLQ form
 
     diff_a = np.diff(np.array(list(itertools.combinations(quad_coef['a'], 2))))
     diff_b = np.diff(np.array(list(itertools.combinations(quad_coef['b'], 2))))

@@ -87,7 +87,7 @@ API.
 Two types of input for PLQ Loss are accepted. One is the coefficients of
 each piece with cutoffs :math:`\text{plq}` , the other is the
 coefficients only and takes the maximum of each piece
-:math:`\text{minimax}`.
+:math:`\text{max}`.
 
 .. math::
 
@@ -111,7 +111,7 @@ or
 
 .. code:: python
 
-   plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='minimax')
+   plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
 
 Then just \**call its \_2ReHLoss*\* method to decompose it to form
 :math:`(2)`

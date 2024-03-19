@@ -69,7 +69,7 @@ Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine
 Generally Speaking, Utilize the plq composite to solve the ERM problem need three steps below. For details of these functions you can check the API.  
 
 ### 1) Create a PLQ Loss and Decompose  
-Two types of input for PLQ Loss are accepted. One is the coefficients of each piece with cutoffs $\text{plq}$ , the other is the coefficients only and takes the maximum of each piece $\text{minimax}$.
+Two types of input for PLQ Loss are accepted. One is the coefficients of each piece with cutoffs $\text{plq}$ , the other is the coefficients only and takes the maximum of each piece $\text{max}$.
 
 $$
 L(z)=
@@ -87,14 +87,14 @@ or
 
 $$
 L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace.  i=1,2,...,n
-\tag{minimax} 
+\tag{max} 
 $$
 
 **Create a PLQ Loss**  
 ```python
 import numpy as np
 from plqcom import PLQLoss
-plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='minimax')
+plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
 ```
 
 Then call **plq_to_rehloss** method to decompose it to form $(2)$  
