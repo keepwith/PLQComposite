@@ -93,13 +93,13 @@ $$
 **Create a PLQ Loss**  
 ```python
 import numpy as np
-from plqcom.PLQLoss import PLQLoss
+from plqcom import PLQLoss
 plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='minimax')
 ```
 
 Then call **plq_to_rehloss** method to decompose it to form $(2)$  
 ```python
-from plqcom.PLQProperty import plq_to_rehloss
+from plqcom import plq_to_rehloss
 rehloss = plq_to_rehloss(plqloss)
 ```
 
@@ -108,7 +108,7 @@ Usually, there exists a special relationship between each $L_{i}$
 $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})$$  
 Call **affine_transformation** method to broadcast
 ```python
-from plqcom.ReHProperty import affine_transformation
+from plqcom import affine_transformation
 rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
 ```
 ### 3) Use Rehline solve the problem
