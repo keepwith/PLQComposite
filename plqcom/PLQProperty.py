@@ -24,8 +24,7 @@ def is_continuous(plq_loss):
 
     Examples
     --------
-    >>> from plqcom.PLQLoss import PLQLoss
-    >>> from plqcom.PLQProperty import is_continuous
+    >>> from plqcom import PLQLoss, is_continuous
     >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]),
     >>>                                                     'c': np.array([1, 1])})
     >>> is_continuous(plqloss)
@@ -64,8 +63,7 @@ def is_convex(plq_loss):
 
     Examples
     --------
-    >>> from plqcom.PLQLoss import PLQLoss
-    >>> from plqcom.PLQProperty import is_convex
+    >>> from plqcom import PLQLoss, is_convex
     >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]),
     >>>                                                     'c': np.array([1, 1])})
     >>> is_convex(plqloss)
@@ -97,8 +95,7 @@ def check_cutoff(plq_loss):
 
     Examples
     --------
-    >>> from plqcom.PLQLoss import PLQLoss
-    >>> from plqcom.PLQProperty import check_cutoff
+    >>> from plqcom import PLQLoss, check_cutoff
     >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
     >>> check_cutoff(plqloss)
     >>> plq_loss.cutpoints
@@ -137,8 +134,7 @@ def find_min(plq_loss):
 
     Examples
     --------
-    >>> from plqcom.PLQLoss import PLQLoss
-    >>> from plqcom.PLQProperty import find_min
+    >>> from plqcom import PLQLoss, find_min
     >>> plqloss = PLQLoss(cutpoints=np.array([0]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
     >>> find_min(plqloss)
     >>> plq_loss.min_val

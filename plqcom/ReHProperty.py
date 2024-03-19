@@ -32,9 +32,7 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0):
 
     Examples
     --------
-    >>> from plqcom.PLQLoss import PLQLoss
-    >>> from plqcom.ReHProperty import affine_transformation
-    >>> from plqcom.PLQProperty import plq_to_rehloss
+    >>> from plqcom import PLQLoss, affine_transformation, plq_to_rehloss
     >>> import numpy as np
     >>> from rehline import ReHLine
     >>> n, d, C = 1000, 3, 0.5
