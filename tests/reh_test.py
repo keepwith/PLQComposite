@@ -1,6 +1,4 @@
-from plqcom.PLQLoss import PLQLoss
-from plqcom.PLQProperty import plq_to_rehloss
-from plqcom.ReHProperty import affine_transformation
+from plqcom import PLQLoss, plq_to_rehloss, affine_transformation
 
 # test SVM on simulated dataset
 import numpy as np

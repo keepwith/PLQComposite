@@ -1,8 +1,8 @@
 import numpy as np
 import unittest
 
-from plqcom.PLQLoss import PLQLoss
-from plqcom.PLQProperty import plq_to_rehloss, is_continuous, is_convex, check_cutoff, find_min
+from plqcom import PLQLoss
+from plqcom import plq_to_rehloss, is_continuous, is_convex, check_cutoff, find_min
 
 
 class TestPLQLoss(unittest.TestCase):

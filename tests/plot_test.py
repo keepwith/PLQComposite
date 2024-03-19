@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from rehline._base import relu, rehu
+from rehline import relu, rehu
 
 
 def plot_origin():
