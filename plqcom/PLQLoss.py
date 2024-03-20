@@ -28,15 +28,31 @@ class PLQLoss(object):
             In this form, cutpoints must be given explicitly.
 
         'max' for the max form
-            The max form is a special form of the PLQ function, which is the pointwise maximum of several quadratic functions.
+            The max form is a special form of the PLQ function, which is the pointwise maximum of several quadratic
+            functions.
+
             The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
+
+        'points' for the piecewise linear form based on given points
+            The piecewise linear form is a special form of the PLQ function, which is the piecewise linear function.
+            The function will connect the given points to form a piecewise linear loss.
+            In the infinity and negative infinity, the function will be the same as its adjacent piece.
 
     cutpoints : {array-like} of float, optional, default: None
         cutpoints of the PLQoss, except -np.inf and np.inf
 
-        if the form is 'max', the cutpoints is not necessary
+        if the form is 'max' or 'points', the cutpoints is not necessary
 
         if the form is 'plq', the cutpoints is necessary
+
+    points : {array-like} of (x,y) pairs [(x1,y1),(x2,y2)] or {dict-like} of {'x': [], 'y': []} or {2d-array} of x and y
+        optional, default: None
+
+        points of the piecewise linear form of the PLQoss
+
+        if the form is 'points', the points is necessary
+
+        if the form is 'max' or 'plq', the points is not necessary
 
     Examples
     --------
@@ -49,34 +65,33 @@ class PLQLoss(object):
     >>> test_loss(x)
     """
 
-    def __init__(self, quad_coef, form="plq", cutpoints=np.empty(shape=(0,))):
-        # check the input data type, if not np.array, convert it to np.array
-        # needed to be fixed further
-        if not isinstance(quad_coef['a'], np.ndarray):
-            quad_coef['a'] = np.array(quad_coef['a'])
-        if not isinstance(quad_coef['b'], np.ndarray):
-            quad_coef['b'] = np.array(quad_coef['b'])
-        if not isinstance(quad_coef['c'], np.ndarray):
-            quad_coef['c'] = np.array(quad_coef['c'])
-        if not isinstance(cutpoints, np.ndarray):
-            cutpoints = np.array(cutpoints)
+    def __init__(self, quad_coef=None, form="plq", cutpoints=np.empty(shape=(0,)), points=np.empty(shape=(0, 2))):
+        # check the quad_coef data type, if not np.array, convert it to np.array
+        if quad_coef not in [None, {}]:
+            if not isinstance(quad_coef['a'], np.ndarray):
+                quad_coef['a'] = np.array(quad_coef['a'])
+            if not isinstance(quad_coef['b'], np.ndarray):
+                quad_coef['b'] = np.array(quad_coef['b'])
+            if not isinstance(quad_coef['c'], np.ndarray):
+                quad_coef['c'] = np.array(quad_coef['c'])
+            if not isinstance(cutpoints, np.ndarray):
+                cutpoints = np.array(cutpoints)
 
-        # check the quad_coef
-        if len(quad_coef['a']) != len(quad_coef['b']) or len(quad_coef['a']) != len(quad_coef['c']):
-            print("The size of `quad_coef` is not matched!")
-            exit()
+            # check the quad_coef length
+            if len(quad_coef['a']) != len(quad_coef['b']) or len(quad_coef['a']) != len(quad_coef['c']):
+                print("The size of `quad_coef` is not matched!")
+                exit()
 
         # check the input form
-        if form not in ['plq', 'max']:
+        if form not in ['plq', 'max', 'points']:
             print("The input form of PLQ function is not supported!")
             exit()
 
         # max form input
         if form == "max":
+            self.cutpoints = []
             self.quad_coef, self.cutpoints, self.n_pieces = max_to_plq(quad_coef)
-            self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
-            self.min_val = np.inf
-            self.min_knot = np.inf
+
 
         # PLQ form input
         elif form == 'plq':
@@ -87,12 +102,25 @@ class PLQLoss(object):
             elif len(cutpoints) != (len(quad_coef['a']) - 1):
                 print("The size of cutpoints and quad_coef is not matched!")
                 exit()
-            else:
-                self.cutpoints = np.concatenate(([-np.inf], cutpoints, [np.inf]))
+
+            self.cutpoints = cutpoints
             self.quad_coef = quad_coef
             self.n_pieces = len(self.quad_coef['a'])
-            self.min_val = np.inf
-            self.min_knot = np.inf
+
+        # piecewise linear form input
+        elif form == 'points':
+            # check the input points
+            if len(points) < 2:
+                print("Input points are not given or not enough!")
+                exit()
+            else:
+                self.cutpoints, self.quad_coef, self.n_pieces = points_to_plq(points)
+
+        self.quad_coef, self.cutpoints, self.n_pieces = merge_successive_intervals(self.quad_coef, self.cutpoints)
+        # initialize the minimum value and knot
+        self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
+        self.min_val = np.inf
+        self.min_knot = np.inf
 
     def __call__(self, x):
         """
@@ -161,20 +189,48 @@ def max_to_plq(quad_coef):
             new_quad_coef['a'] = np.append(new_quad_coef['a'], quad_coef['a'][ind_tmp])
             new_quad_coef['b'] = np.append(new_quad_coef['b'], quad_coef['b'][ind_tmp])
             new_quad_coef['c'] = np.append(new_quad_coef['c'], quad_coef['c'][ind_tmp])
-
-        # merge the successive intervals with the same coefficients
-        i = 0
-        while i < len(new_quad_coef['a']) - 1:
-            if (new_quad_coef['a'][i] == new_quad_coef['a'][i + 1] and
-                    new_quad_coef['b'][i] == new_quad_coef['b'][i + 1] and
-                    new_quad_coef['c'][i] == new_quad_coef['c'][i + 1]):
-                new_quad_coef['a'] = np.delete(new_quad_coef['a'], i + 1)
-                new_quad_coef['b'] = np.delete(new_quad_coef['b'], i + 1)
-                new_quad_coef['c'] = np.delete(new_quad_coef['c'], i + 1)
-                cutpoints = np.delete(cutpoints, i)
-            else:
-                i += 1
         new_cutpoints = cutpoints
         new_n_pieces = len(new_quad_coef['a'])
 
     return new_quad_coef, new_cutpoints, new_n_pieces
+
+
+def points_to_plq(points):
+    # convert the points form to the PLQ form
+    x, y = [], []
+    if type(points) == dict:
+        x, y = np.array(points['x']), np.array(points['y'])
+    elif type(points) == np.ndarray:
+        if points.shape[0] == 2:
+            x, y = points[0, :], points[1, :]
+        elif points.shape[1] == 2:
+            x, y = points[:, 0], points[:, 1]
+    else:
+        print("The input points form is not supported!")
+        exit()
+
+    b = np.diff(y) / np.diff(x)
+    c = y[1:] - b * x[1:]
+    b = np.concatenate(([b[0]], b, [b[-1]]))
+    c = np.concatenate(([c[0]], c, [c[-1]]))
+    cutpoints = x
+    quad_coef = {'a': np.zeros_like(b), 'b': b, 'c': c}
+    n_pieces = len(b)
+    return cutpoints, quad_coef, n_pieces
+
+
+def merge_successive_intervals(quad_coef, cutpoints):
+    # merge the successive intervals with the same coefficients
+    i = 0
+    while i < len(quad_coef['a']) - 1:
+        if (quad_coef['a'][i] == quad_coef['a'][i + 1] and
+                quad_coef['b'][i] == quad_coef['b'][i + 1] and
+                quad_coef['c'][i] == quad_coef['c'][i + 1]):
+            quad_coef['a'] = np.delete(quad_coef['a'], i + 1)
+            quad_coef['b'] = np.delete(quad_coef['b'], i + 1)
+            quad_coef['c'] = np.delete(quad_coef['c'], i + 1)
+            cutpoints = np.delete(cutpoints, i)
+        else:
+            i += 1
+    n_pieces = len(quad_coef['a'])
+    return quad_coef, cutpoints, n_pieces

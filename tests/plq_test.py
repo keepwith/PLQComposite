@@ -56,7 +56,7 @@ class TestPLQLoss(unittest.TestCase):
         print(rehloss.rehu_cut)
         print(rehloss.n)
 
-    def test_max2plq(self):
+    def test_max_to_plq(self):
         #
         print("test 3")
         plqloss = PLQLoss(form="max",
@@ -94,3 +94,51 @@ class TestPLQLoss(unittest.TestCase):
         print(rehloss.rehu_intercept)
         print(rehloss.rehu_cut)
         print(rehloss.n)
+
+    def test_points_to_plq(self):
+        print("test 6")
+        plqloss = PLQLoss(form="points", points=np.array([[-3, 0], [0, 0], [1, 1], [2, 2]]))
+        print(plqloss.cutpoints, plqloss.quad_coef)
+        rehloss = plq_to_rehloss(plqloss)
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)
+
+        print("test 7")
+        plqloss = PLQLoss(form="points", points=np.array([[-1, 1], [0, 0], [1, 1], [3, 4]]))
+        rehloss = plq_to_rehloss(plqloss)
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)
+        print(rehloss.n)
+
+        print("test 8")
+        plqloss = PLQLoss(form="points", points={'x': np.array([-3, 0, 1, 2]), 'y': np.array([0, 0, 1, 2])})
+        rehloss = plq_to_rehloss(plqloss)
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)
+
+        print("test 9")
+        plqloss = PLQLoss(form="points", points=np.array([[-3, 0, 1, 2], [0, 0, 1, 2]]))
+        rehloss = plq_to_rehloss(plqloss)
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)
+
+        print("test 10")
+        plqloss = PLQLoss(form="points", points=np.array([(-1, 1), (0, 0), (1, 1), (3, 4)]))
+        rehloss = plq_to_rehloss(plqloss)
+        print(rehloss.relu_coef)
+        print(rehloss.relu_intercept)
+        print(rehloss.rehu_coef)
+        print(rehloss.rehu_intercept)
+        print(rehloss.rehu_cut)
