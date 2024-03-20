@@ -8,7 +8,7 @@ import numpy as np
 from rehline import ReHLoss
 
 
-def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0):
+def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0, form="custom", y=1):
     """Since composite ReLU-ReHU function is closure under affine transformation,
     this function perform affine transformation on the PLQ object
 
@@ -16,14 +16,31 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0):
     ----------
     rehloss : ReHLoss
          A ReHLoss object
+
     c: a number or {array_like} of shape (n_samples,), default=1
         scale parameter on loss function and require c > 0
+
     p: a number or {array_like} of shape (n_samples,),default=1
         scale parameter on z
+
     q: a number or {array_like} of shape (n_samples,),default=0
         shift parameter on z
+
     n: int, default=1
         number of samples
+
+    form: str, default='custom'
+        the form of affine transformation
+        'custom' for custom form
+            In this form, the c, p, q can be either a number or an array
+        'classification' for classification form
+            In this form, $L_i = c_iL(y_i z_i)$, i.e. p=y_i, q=0
+        'regression' for regression form
+            In this form, $L_i = c_iL(y_i - z_i)$, i.e. p=-1, q=y
+            should be very careful when specify the original L and parameters
+
+    y: {array_like} of shape (n_samples,), default=None, only required when form is 'classification' or 'regression'
+        the label of the samples
 
     Returns
     -------
@@ -46,11 +63,20 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0):
     """
 
     loss = ReHLoss(relu_coef=rehloss.relu_coef, relu_intercept=rehloss.relu_intercept,
-                   rehu_coef=rehloss.rehu_coef, rehu_intercept=rehloss.rehu_intercept, rehu_cut=rehloss.rehu_cut)
+                   rehu_coef=rehloss.rehu_coef, rehu_intercept=rehloss.rehu_intercept, rehu_cut=rehloss.rehu_cut, )
 
     # check if the ReHLoss presentation is empty
     if loss.relu_coef.size == 0 and loss.rehu_coef.size == 0:
         raise Exception("The ReHLoss presentation is empty!")
+
+    if form == "regression":
+        p = -1
+        q = y
+    elif form == "classification":
+        p = y
+        q = 0
+    elif form != "custom":
+        raise Exception("The input form of affine transformation is not supported!")
 
     # check if the ReH presentation is a single loss. if true, then broadcast it
     if loss.n < n:
