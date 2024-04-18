@@ -69,7 +69,7 @@ Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine
 Generally Speaking, Utilize the plq composite to solve the ERM problem need three steps below. For details of these functions you can check the API.  
 
 ### 1) Create a PLQ Loss and Decompose  
-Two types of input for PLQ Loss are accepted. One is the coefficients of each piece with cutoffs $\text{plq}$ , the other is the coefficients only and takes the maximum of each piece $\text{max}$.
+Three types of input for PLQ Loss are accepted. One is the coefficients of each piece with cutoffs $\text{plq}$(default form), another is the coefficients only and takes the maximum of each piece $\text{max}$, the other is the linear version based on a series of given points $\text{points}$.  
 
 $$
 L(z)=
@@ -90,27 +90,54 @@ L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace.  i=1,2,...,n
 \tag{max} 
 $$
 
+
+or 
+
+
+\begin{equation}
+L(z)=
+\begin{cases}
+\ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
+\ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), & \text{if } x_{i-1} < z \leq x_{i}, i=2,...,n \\
+\ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n}.
+\end{cases}
+\tag{points}
+\end{equation}
+where $\lbrace (x_1,y_1), (x_2,y_2), ..., (x_n, y_n) \rbrace$ is a series of given points and $n\geq 2$   
+
 **Create a PLQ Loss**  
 ```python
 import numpy as np
 from plqcom import PLQLoss
-plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
+# plq
+plqloss1 = PLQLoss(cutpoints=np.array([0, 1, 2, 3]),quad_coef={'a': np.array([0, 0, 0, 0, 0]), 'b': np.array([0, 1, 2, 3, 4]), 'c': np.array([0, 0, -1, -3, -6])})
+# max
+plqloss2 = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
+# points
+plqloss3 = PLQLoss(points=np.array([[-3, 0], [0, 0], [1, 1], [2, 2]]), form="points")
 ```
 
 Then call **plq_to_rehloss** method to decompose it to form $(2)$  
 ```python
 from plqcom import plq_to_rehloss
-rehloss = plq_to_rehloss(plqloss)
+rehloss = plq_to_rehloss(plqloss1)
 ```
 
 ### 2) Broadcast to all Samples
 Usually, there exists a special relationship between each $L_{i}$
 $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})$$  
-Call **affine_transformation** method to broadcast
+For Regression Problems, $L_i(z_i)=c_{i}L(y_{i}-z_{i})$.   
+For Classification Problems, $L_i(z_i)=c_{i}L(y_{i}z_{i})$.  
+
+You call **affine_transformation** method to broadcast by specifying $p_{i}$ and $q_{i}$ or just input form='regression' or 'classification'  
 ```python
 from plqcom import affine_transformation
+# specify p and q
 rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
+# form = 'classification'
+rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification')
 ```
+
 ### 3) Use Rehline solve the problem
 ```
 from rehline import ReHLine
