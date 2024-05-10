@@ -103,6 +103,8 @@ L(z)=
 \end{cases}
 \tag{points}
 \end{equation}
+
+
 where $\lbrace (x_1,y_1), (x_2,y_2), ..., (x_n, y_n) \rbrace$ is a series of given points and $n\geq 2$   
 
 **Create a PLQ Loss**  
