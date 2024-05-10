@@ -94,7 +94,7 @@ $$
 or 
 
 
-\begin{equation}
+$$
 L(z)=
 \begin{cases}
 \ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
@@ -102,10 +102,10 @@ L(z)=
 \ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n}.
 \end{cases}
 \tag{points}
-\end{equation}
+$$
 
 
-where $\lbrace (x_1,y_1), (x_2,y_2), ..., (x_n, y_n) \rbrace$ is a series of given points and $n\geq 2$   
+where $\lbrace (x_1,y_1),\ (x_2,y_2),\ ...,\ (x_n, y_n) \rbrace$ is a series of given points and $n\geq 2$   
 
 **Create a PLQ Loss**  
 ```python
