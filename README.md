@@ -40,13 +40,13 @@ Let $z_i=\mathbf{x}_ i^\intercal \mathbf{\beta}$, then $L_i(z_i)$ is a univariat
 
 
 $$
-L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{2} 
+L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), \tag{2} 
 $$
 
 where $u_{l},v_{l}$ and $s_{h},t_{h},\tau_{h}$ are the ReLU-ReHU loss parameters.
 The **ReLU** and **ReHU** functions are defined as 
 
-$$\mathrm{ReLU}(z)=\max(z,0)$$ 
+$$\mathrm{ReLU}(z)=\max(z,0).$$ 
 
 and
 
@@ -54,10 +54,10 @@ and
 $$
 \mathrm{ReHU}_\tau(z) =
   \begin{cases}
-  \ 0,                     & z \leq 0 \\
-  \ z^2/2,                 & 0 < z \leq \tau \\
-  \ \tau( z - \tau/2 ),   & z > \tau
-  \end{cases}.
+  \ 0,                     & \text{if } z \leq 0, \\
+  \ z^2/2,                 & \text{if } 0 < z \leq \tau, \\
+  \ \tau( z - \tau/2 ),   & \text{if } z > \tau.
+  \end{cases}
 $$
 
 
@@ -75,7 +75,7 @@ $$
 L(z)=
 \begin{cases}
 \ a_0 z^2 + b_0 z + c_0, & \text{if } z \leq d_0, \\
-\ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, i=1,2,...,n-1 \\
+\ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, \ i=1,2,...,n-1 \\
 \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
 \end{cases}
 \tag{plq} 
@@ -86,7 +86,7 @@ or
 
 
 $$
-L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace.  i=1,2,...,n
+L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \qquad i=1,2,...,n
 \tag{max} 
 $$
 
@@ -98,8 +98,8 @@ $$
 L(z)=
 \begin{cases}
 \ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
-\ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), & \text{if } x_{i-1} < z \leq x_{i}, i=2,...,n \\
-\ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n}.
+\ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), \ & \text{if } x_{i-1} < z \leq x_{i}, \ i=2,...,n \\
+\ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n},
 \end{cases}
 \tag{points}
 $$
@@ -127,7 +127,7 @@ rehloss = plq_to_rehloss(plqloss1)
 
 ### 2) Broadcast to all Samples
 Usually, there exists a special relationship between each $L_{i}$
-$$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})$$  
+$$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}).$$  
 For Regression Problems, $L_i(z_i)=c_{i}L(y_{i}-z_{i})$.   
 For Classification Problems, $L_i(z_i)=c_{i}L(y_{i}z_{i})$.  
 

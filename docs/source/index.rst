@@ -14,14 +14,14 @@ Welcome to PLQ Composite Decomposition's documentation!
 -  Download Repo:
    ``$ git clone https://github.com/keepwith/PLQComposite.git``
 -  Technical Details:
-   `technical_details.pdf <https://github.com/keepwith/PLQComposite/docs/technical_details.pdf>`__
+   `technical_details.pdf <https://github.com/keepwith/PLQComposite/blob/main/docs/technical_details.pdf>`__
 
 Contents
 --------
 
 -  `Introduction <#Introduction>`__
 -  `Usage <#Usage>`__
--  `Examples <#Examples and Notebooks>`__
+-  `Examples and Notebooks <#Examples-and-Notebooks>`__
 -  `References <#References>`__
 
 Introduction
@@ -51,13 +51,13 @@ software package which adopts a **two-step method** (**decompose** and
 .. math::
 
 
-   L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}) \tag{2}
+   L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), \tag{2}
 
 where :math:`u_{l},v_{l}` and :math:`s_{h},t_{h},\tau_{h}` are the
 ReLU-ReHU loss parameters. The **ReLU** and **ReHU** functions are
 defined as
 
-.. math:: \mathrm{ReLU}(z)=\max(z,0)
+.. math:: \mathrm{ReLU}(z)=\max(z,0).
 
 and
 
@@ -66,10 +66,10 @@ and
 
    \mathrm{ReHU}_\tau(z) =
      \begin{cases}
-     \ 0,                     & z \leq 0 \\
-     \ z^2/2,                 & 0 < z \leq \tau \\
-     \ \tau( z - \tau/2 ),   & z > \tau
-     \end{cases}.
+     \ 0,                     & \text{if } z \leq 0, \\
+     \ z^2/2,                 & \text{if } 0 < z \leq \tau, \\
+     \ \tau( z - \tau/2 ),   & \text{if } z > \tau.
+     \end{cases}
 
 Finally, users can utilize ReHLine which is another useful software
 package to solve the ERM problem.
@@ -84,41 +84,67 @@ API.
 1) Create a PLQ Loss and Decompose
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Two types of input for PLQ Loss are accepted. One is the coefficients of
-each piece with cutoffs :math:`\text{plq}` , the other is the
-coefficients only and takes the maximum of each piece
-:math:`\text{max}`.
+Three types of input for PLQ Loss are accepted in this package. One is
+the coefficients of each piece with cutoffs (named **plq**, default
+form), another is the coefficients only and takes the maximum of each
+piece named **max**, the other is the linear version based on a series
+of given points (named **points**). The explicit definitions of plq, max
+and points are shown below.
 
 .. math::
-
-
+   \begin{equation}
+   \tag{plq}
    L(z)=
    \begin{cases}
    \ a_0 z^2 + b_0 z + c_0, & \text{if } z \leq d_0, \\
-   \ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, i=1,2,...,n-1 \\
+   \ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, \ i=1,2,...,n-1 \\
    \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
    \end{cases}
-
+   \end{equation}
 or
 
 .. math::
 
+   \begin{equation}
+   \tag{max}
+   L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \quad i=1,2,...,n
+   \end{equation}
 
-   L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace.  i=1,2,...,n
+or
 
+.. math::
+   \begin{equation}
+   \tag{points}
+   L(z)=
+   \begin{cases}
+   \ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
+   \ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), & \text{if } x_{i-1} < z \leq x_{i}, \ i=2,...,n \\
+   \ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n},
+   \end{cases}
+   \end{equation}
+
+where :math:`\lbrace (x_1,y_1),\ (x_2,y_2),\ ...,\ (x_n, y_n) \rbrace`
+is a series of given points and :math:`n\geq 2`
 
 **Create a PLQ Loss**
 
 .. code:: python
 
-   plqloss = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
+   import numpy as np
+   from plqcom import PLQLoss
+   # plq
+   plqloss1 = PLQLoss(cutpoints=np.array([0, 1, 2, 3]),quad_coef={'a': np.array([0, 0, 0, 0, 0]), 'b': np.array([0, 1, 2, 3, 4]), 'c': np.array([0, 0, -1, -3, -6])})
+   # max
+   plqloss2 = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -1., -1.]), 'c': np.array([0., 1., 0.5])}, form='max')
+   # points
+   plqloss3 = PLQLoss(points=np.array([[-3, 0], [0, 0], [1, 1], [2, 2]]), form="points")
 
-Then just \**call its \_2ReHLoss*\* method to decompose it to form
-:math:`(2)`
+Then call **plq_to_rehloss** method to decompose it to form :math:`(2)`
 
 .. code:: python
 
-   rehloss = plqloss._2ReHLoss()
+   from plqcom import plq_to_rehloss
+   rehloss = plq_to_rehloss(plqloss1)
 
 2) Broadcast to all Samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -126,18 +152,33 @@ Then just \**call its \_2ReHLoss*\* method to decompose it to form
 | Usually, there exists a special relationship between each
   :math:`L_{i}`
 
-  .. math:: L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})
-| Call **affine_transformation** method to broadcast
+  .. math:: L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}).
+| For Regression Problems, :math:`L_i(z_i)=c_{i}L(y_{i}-z_{i})`.
+| For Classification Problems, :math:`L_i(z_i)=c_{i}L(y_{i}z_{i})`.
+
+You call **affine_transformation** method to broadcast by specifying
+:math:`p_{i}` and :math:`q_{i}` or just input form=‘regression’ or
+‘classification’. You should be very careful when directly specify the
+forms.
+
+If the special relationship does not exist in your task, you can also
+manually repeat stage 1 and combines all the rehloss together and then
+use rehline to solve the problem.
 
 .. code:: python
 
+   from plqcom import affine_transformation
+   # specify p and q
    rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
+   # form = 'classification'
+   rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification')
 
 3) Use Rehline solve the problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code:: python
 
+   from rehline import ReHLine
    clf = ReHLine(loss={'name': 'custom'}, C=C)
    clf.U, clf.V, clf.Tau, clf.S, clf.T= rehloss.relu_coef, rehloss.relu_intercept,rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
    clf.fit(X=X)
@@ -147,10 +188,10 @@ Examples and Notebooks
 ----------------------
 
 -  `Hinge and Square
-   loss <https://github.com/keepwith/PLQComposite/examples/ex1_hinge_square.ipynb>`__
--  `SVM <https://github.com/keepwith/PLQComposite/examples/ex2_svm.ipynb>`__
+   loss <https://github.com/keepwith/PLQComposite/blob/main/examples/ex1_hinge_square.ipynb>`__
+-  `SVM <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__
 -  `Ridge
-   Regression <https://github.com/keepwith/PLQComposite/examples/ex3_regression.ipynb>`__
+   Regression <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__
 
 References
 ----------
