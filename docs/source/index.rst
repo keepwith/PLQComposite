@@ -50,7 +50,6 @@ software package which adopts a **two-step method** (**decompose** and
 
 .. math::
 
-
    L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), \tag{2}
 
 where :math:`u_{l},v_{l}` and :math:`s_{h},t_{h},\tau_{h}` are the
@@ -101,6 +100,7 @@ and points are shown below.
    \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
    \end{cases}
    \end{equation}
+
 or
 
 .. math::
