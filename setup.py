@@ -11,7 +11,7 @@ __version__ = "0.0.1"
 SETUP_DIRECTORY = Path(__file__).resolve().parent
 
 setup(
-    name="PLQ Composite Decomposition",
+    name="PLQ Decomposition",
     version=__version__,
     author=["Tingxian Gao", "Ben Dai"],
     author_email="txgao@link.cuhk.edu.hk",

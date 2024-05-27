@@ -25,10 +25,9 @@ def is_continuous(plq_loss):
     Examples
     --------
     >>> from plqcom import PLQLoss, is_continuous
-    >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]),
-    >>>                                                     'c': np.array([1, 1])})
-    >>> is_continuous(plqloss)
-    >>> True
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0.]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> is_continuous(plq_loss)
+    True
     """
 
     cutpoints = plq_loss.cutpoints[1:-1].copy()
@@ -64,10 +63,9 @@ def is_convex(plq_loss):
     Examples
     --------
     >>> from plqcom import PLQLoss, is_convex
-    >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]),
-    >>>                                                     'c': np.array([1, 1])})
-    >>> is_convex(plqloss)
-    >>> True
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0.]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> is_convex(plq_loss)
+    True
     """
     # check the second order derivatives
     if np.min(plq_loss.quad_coef['a']) < 0:
@@ -96,10 +94,10 @@ def check_cutoff(plq_loss):
     Examples
     --------
     >>> from plqcom import PLQLoss, check_cutoff
-    >>> plqloss = PLQLoss(cutpoints=np.array([]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
-    >>> check_cutoff(plqloss)
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0.]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> check_cutoff(plq_loss)
     >>> plq_loss.cutpoints
-    >>> [0.]
+    array([-inf,   0.,  inf])
     """
     cutpoints = plq_loss.cutpoints.copy()
     quad_coef = plq_loss.quad_coef.copy()
@@ -135,10 +133,10 @@ def find_min(plq_loss):
     Examples
     --------
     >>> from plqcom import PLQLoss, find_min
-    >>> plqloss = PLQLoss(cutpoints=np.array([0]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
-    >>> find_min(plqloss)
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> find_min(plq_loss)
     >>> plq_loss.min_val
-    >>> 1
+    1.0
     """
     # find the minimum value and knot
     out_cut = plq_loss.quad_coef['a'][:-1] * plq_loss.cutpoints[1:-1] ** 2 + (
@@ -151,12 +149,23 @@ def find_min(plq_loss):
 
 
 def plq_to_rehloss(plq_loss):
-    """convert the PLQ function to a ReHLoss function
+    """convert the PLQLoss function to a ReHLoss function piece by piece.
+        The details are described in the technical details.
+
+    Parameters
+    ----------
+    plq_loss : PLQLoss
+         A PLQLoss object
 
     Returns
     -------
         an object of ReHLoss
 
+    Examples
+    --------
+    >>> from plqcom import PLQLoss, plq_to_rehloss
+    >>> plq_loss = PLQLoss(cutpoints=np.array([0]),quad_coef={'a': np.array([0, 0]), 'b': np.array([-1, 1]), 'c': np.array([1, 1])})
+    >>> reh_loss = plq_to_rehloss(plq_loss)
     """
 
     # check the continuity and convexity of the PLQ function

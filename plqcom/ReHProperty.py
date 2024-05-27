@@ -10,7 +10,7 @@ from rehline import ReHLoss
 
 def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0, form="custom", y=1):
     """Since composite ReLU-ReHU function is closure under affine transformation,
-    this function perform affine transformation on the PLQ object
+    this function perform affine transformation on the PLQ object.
 
     Parameters
     ----------

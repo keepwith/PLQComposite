@@ -1,9 +1,9 @@
-matplotlib
 numpy
 rehline
-unittest
-pandas
 scipy
+pybind11
+pandas
+matplotlib
 setuptools
 Sphinx
 nbsphinx
@@ -13,4 +13,5 @@ sphinx_theme_pd
 sphinx_autodoc_typehints
 sphinx-press-theme
 sphinx_gallery
-pandoc
+sphinx-autoapi
+renku_sphinx_theme

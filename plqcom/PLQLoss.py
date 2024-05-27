@@ -11,14 +11,14 @@ import itertools
 
 class PLQLoss(object):
     """
-    PLQLoss is a class represents a continuous convex piecewise quandratic function (with a function converting to
-    ReHLoss).
+    PLQLoss is a class represents a continuous convex piecewise quandratic loss function, which adopts three types of
+    input forms: 'plq', 'max' and 'points'.
 
     Parameters
     ----------
 
     quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
-        The quandratic coefficients in pieces of the PLQoss.
+        The quandratic coefficients in pieces of the PLQLoss.
         The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
@@ -28,27 +28,30 @@ class PLQLoss(object):
             In this form, cutpoints must be given explicitly.
 
         'max' for the max form
-            The max form is a special form of the PLQ function, which is the pointwise maximum of several quadratic
-            functions.
-
-            The cutpoints are not necessary in this form. The cutpoints will be automatically calculated.
+            The max form is a special form of the PLQ function, which is the pointwise maximum of several linear or
+            quadratic functions.
+            The cutpoints are not necessary in this form, since they will be automatically calculated.
 
         'points' for the piecewise linear form based on given points
             The piecewise linear form is a special form of the PLQ function, which is the piecewise linear function.
             The function will connect the given points to form a piecewise linear loss.
-            In the infinity and negative infinity, the function will be the same as its adjacent piece.
+            For the first piece and the last piece related to infinity, they will be the same as their adjacent piece.
 
     cutpoints : {array-like} of float, optional, default: None
-        cutpoints of the PLQoss, except -np.inf and np.inf
+        cutpoints of the PLQLoss, except -np.inf and np.inf
 
         if the form is 'max' or 'points', the cutpoints is not necessary
 
         if the form is 'plq', the cutpoints is necessary
 
-    points : {array-like} of (x,y) pairs [(x1,y1),(x2,y2)] or {dict-like} of {'x': [], 'y': []} or {2d-array} of x and y
-        optional, default: None
+    points : {array-like} of (x,y) pairs [(x1, y1), (x2, y2), ... (xn, yn)]
+            or {dict-like} of {'x': [x1, x2, ..., xn], 'y': [y1, y2, ... yn]}
+            or {2d-array-like} of [[x1, x2, ..., xn], [y1, y2, ... yn]]
+            optional, default: None
 
-        points of the piecewise linear form of the PLQoss
+        Points coordinates of the piecewise linear form of the PLQLoss. The PLQLoss will be constructed by straight
+        lines between each two adjcent points according to their x coordinates. Two points with the same x coordinates
+        will be rejected.
 
         if the form is 'points', the points is necessary
 
@@ -56,13 +59,13 @@ class PLQLoss(object):
 
     Examples
     --------
-
     >>> import numpy as np
+    >>> from plqcom import PLQLoss
     >>> cutpoints = [0., 1.]
     >>> quad_coef = {'a': np.array([0., .5, 0.]), 'b': np.array([-1, 0., 1]), 'c': np.array([0., 0., -.5])}
-    >>> test_loss = PLQLoss(quad_coef, cutpoints=cutpoints)
+    >>> random_loss = PLQLoss(quad_coef, cutpoints=cutpoints)
     >>> x = np.arange(-2,2,.05)
-    >>> test_loss(x)
+    >>> random_loss(x)
     """
 
     def __init__(self, quad_coef=None, form="plq", cutpoints=np.empty(shape=(0,)), points=np.empty(shape=(0, 2))):
@@ -92,7 +95,6 @@ class PLQLoss(object):
             self.cutpoints = []
             self.quad_coef, self.cutpoints, self.n_pieces = max_to_plq(quad_coef)
 
-
         # PLQ form input
         elif form == 'plq':
             # check whether the cutpoints are given
@@ -109,7 +111,7 @@ class PLQLoss(object):
 
         # piecewise linear form input
         elif form == 'points':
-            # check the input points
+            # check the length of input points
             if len(points) < 2:
                 print("Input points are not given or not enough!")
                 exit()
@@ -117,26 +119,27 @@ class PLQLoss(object):
                 self.cutpoints, self.quad_coef, self.n_pieces = points_to_plq(points)
 
         self.quad_coef, self.cutpoints, self.n_pieces = merge_successive_intervals(self.quad_coef, self.cutpoints)
-        # initialize the minimum value and knot
+
+        # initialize the minimum value and minimum knot
         self.cutpoints = np.concatenate(([-np.inf], self.cutpoints, [np.inf]))
         self.min_val = np.inf
         self.min_knot = np.inf
 
     def __call__(self, x):
         """
-        Evaluation of PLQLoss function
+        Evaluation of PLQLoss function.
 
         Parameters
         ----------
-
-        x : array-like
-            The input data
+        x : {array-like} of shape {n_samples}
+        Training vector, where `n_samples` is the number of samples.
 
         Returns
         -------
-
-        array-like
-             out = quad_coef['a'][i]*x**2 + quad_coef['b'][i]*x + quad_coef['c'][i], if cutpoints[i] < x < cutpoints[i+1]
+        y : {array-like} of shape {n_samples}
+            The values of the PLQLoss function on each x
+            y[j] = quad_coef['a'][i]*x[j]**2 + quad_coef['b'][i]*x[j] + quad_coef['c'][i],
+            if cutpoints[i] < x[j] < cutpoints[i+1]
         """
 
         x = np.array(x)
@@ -160,7 +163,6 @@ class PLQLoss(object):
 
 def max_to_plq(quad_coef):
     # convert the max form to the PLQ form
-
     diff_a = np.diff(np.array(list(itertools.combinations(quad_coef['a'], 2))))
     diff_b = np.diff(np.array(list(itertools.combinations(quad_coef['b'], 2))))
     diff_c = np.diff(np.array(list(itertools.combinations(quad_coef['c'], 2))))
@@ -171,6 +173,7 @@ def max_to_plq(quad_coef):
         diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
     sol3 = (-diff_b[index_2] - np.sqrt(
         diff_b[index_2] * diff_b[index_2] - 4 * diff_a[index_2] * diff_c[index_2])) / (2 * diff_a[index_2])
+
     # remove duplicate solutions
     cutpoints = np.sort(np.array(list(set(np.concatenate((sol1, sol2, sol3)).tolist())), dtype=float))
 
@@ -209,6 +212,13 @@ def points_to_plq(points):
         print("The input points form is not supported!")
         exit()
 
+    # check the x coordinates
+    if len(x) != len(set(x)):
+        print("Duplicated x! Input ")
+        exit()
+
+    # sort and calculate the quad_coef
+    x, y = zip(*sorted(zip(x, y)))
     b = np.diff(y) / np.diff(x)
     c = y[1:] - b * x[1:]
     b = np.concatenate(([b[0]], b, [b[-1]]))
