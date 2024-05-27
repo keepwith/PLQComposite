@@ -15,7 +15,7 @@
 ## Contents
 - [Introduction](#Introduction)
 - [Usage](#Usage)
-- [Examples](#Examples-and-Notebooks)
+- [Examples and Notebooks](#Examples-and-Notebooks)
 - [References](#References)
 
 
@@ -61,7 +61,7 @@ $$
 $$
 
 
-Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine</a> which is another useful software package to solve the ERM problem.
+Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine</a> which is another useful software package to solve the ERM problem.  
 
 
 
@@ -69,7 +69,7 @@ Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine
 Generally Speaking, Utilize the plq composite to solve the ERM problem need three steps below. For details of these functions you can check the API.  
 
 ### 1) Create a PLQ Loss and Decompose  
-Three types of input for PLQ Loss are accepted. One is the coefficients of each piece with cutoffs $\text{plq}$(default form), another is the coefficients only and takes the maximum of each piece $\text{max}$, the other is the linear version based on a series of given points $\text{points}$.  
+Three types of input for PLQ Loss are accepted in this package. One is the coefficients of each piece with cutoffs (named **plq**, default form), another is the coefficients only and takes the maximum of each piece named **max**, the other is the linear version based on a series of given points (named **points**). The explicit definitions of plq, max and points are shown below.  
 
 $$
 L(z)=
@@ -131,7 +131,10 @@ $$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i})$$
 For Regression Problems, $L_i(z_i)=c_{i}L(y_{i}-z_{i})$.   
 For Classification Problems, $L_i(z_i)=c_{i}L(y_{i}z_{i})$.  
 
-You call **affine_transformation** method to broadcast by specifying $p_{i}$ and $q_{i}$ or just input form='regression' or 'classification'  
+You call **affine_transformation** method to broadcast by specifying $p_{i}$ and $q_{i}$ or just input form='regression' or 'classification'. You should be very careful when directly specify the forms. 
+
+If the special relationship does not exist in your task, you can also manually repeat stage 1 and combines all the rehloss together and then use rehline to solve the problem.  
+
 ```python
 from plqcom import affine_transformation
 # specify p and q
@@ -141,7 +144,7 @@ rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification
 ```
 
 ### 3) Use Rehline solve the problem
-```
+``` python
 from rehline import ReHLine
 clf = ReHLine(loss={'name': 'custom'}, C=C)
 clf.U, clf.V, clf.Tau, clf.S, clf.T= rehloss.relu_coef, rehloss.relu_intercept,rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
@@ -164,4 +167,4 @@ print('sol privided by rehline: %s' % clf.coef_)
 - [1]  Dai, B., & Qiu, Y. (2023, November). ReHLine: Regularized Composite ReLU-ReHU Loss Minimization  with Linear Computation and Linear Convergence. In *Thirty-seventh Conference on Neural Information Processing Systems*.
 - [2]  Vapnik, V. (1991). Principles of risk minimization for learning theory. In *Advances in Neural Information Processing Systems*, pages 831–838.
 
-[Return to top](#Contents)
+[Return to top](#PLQ-Composite-Decomposition)
