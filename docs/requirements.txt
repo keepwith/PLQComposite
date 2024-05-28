@@ -2,7 +2,6 @@ numpy
 rehline
 scipy
 pybind11
-pandas
 matplotlib
 setuptools
 Sphinx

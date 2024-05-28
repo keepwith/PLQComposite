@@ -7,9 +7,6 @@ from setuptools.command.build_ext import build_ext
 
 __version__ = "0.0.1"
 
-# The directory that contains setup.py
-SETUP_DIRECTORY = Path(__file__).resolve().parent
-
 setup(
     name="PLQ Decomposition",
     version=__version__,
@@ -18,9 +15,9 @@ setup(
     url="https://github.com/keepwith/PLQComposite",
     description="Piecewise Linear Quadratic Function Decomposition to Regularized Composite ReLU-ReHU Loss",
     packages=["plqcom"],
-    install_requires=["requests", "numpy", "rehline"],
+    install_requires=["requests", "numpy", "rehline", "scipy", "pybind11", "matplotlib"],
     # extras_require={"test": "pytest"},
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
 )
