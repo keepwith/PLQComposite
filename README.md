@@ -156,7 +156,8 @@ print('sol privided by rehline: %s' % clf.coef_)
 
 
 ## Examples and Notebooks
-- [Hinge and Square loss](https://github.com/keepwith/PLQComposite/blob/main/examples/ex1_hinge_square.ipynb)
+- [Hinge and Square loss](https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing)
+- [Portfilio Optimization](https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing)
 - [SVM](https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb)
 - [Ridge Regression](https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb)
 
