@@ -28,7 +28,10 @@ Given a general regularized ERM problem based on a convex **piecewise linear-qua
 
 
 $$
-\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \boldsymbol{\beta}) + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
+\begin{aligned}
+\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \boldsymbol{\beta}) + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},   
+\end{aligned}
+\tag{1}
 $$
 
 
@@ -40,7 +43,10 @@ Let $z_i=\mathbf{x}_ i^\intercal \mathbf{\beta}$, then $L_i(z_i)$ is a univariat
 
 
 $$
-L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), \tag{2} 
+\begin{aligned}
+L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), 
+\end{aligned}
+\tag{2} 
 $$
 
 where $u_{l},v_{l}$ and $s_{h},t_{h},\tau_{h}$ are the ReLU-ReHU loss parameters.
@@ -72,12 +78,14 @@ Generally Speaking, Utilize the plq composite to solve the ERM problem need thre
 Three types of input for PLQ Loss are accepted in this package. One is the coefficients of each piece with cutoffs (named **plq**, default form), another is the coefficients only and takes the maximum of each piece named **max**, the other is the linear version based on a series of given points (named **points**). The explicit definitions of plq, max and points are shown below.  
 
 $$
+\begin{aligned}
 L(z)=
 \begin{cases}
 \ a_0 z^2 + b_0 z + c_0, & \text{if } z \leq d_0, \\
 \ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, \ i=1,2,...,n-1 \\
 \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
 \end{cases}
+\end{aligned}
 \tag{plq} 
 $$
 
@@ -86,7 +94,9 @@ or
 
 
 $$
+\begin{aligned}
 L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \qquad i=1,2,...,n
+\end{aligned}
 \tag{max} 
 $$
 
@@ -95,12 +105,14 @@ or
 
 
 $$
+\begin{aligned}
 L(z)=
 \begin{cases}
 \ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
 \ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), \ & \text{if } x_{i-1} < z \leq x_{i}, \ i=2,...,n \\
 \ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n},
 \end{cases}
+\end{aligned}
 \tag{points}
 $$
 
