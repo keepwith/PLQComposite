@@ -35,7 +35,7 @@ $$
 $$
 
 
-Let $z_i=\mathbf{x}_ i^\intercal \mathbf{\beta}$, then $L_i(z_i)$ is a univariate PLQ function. 
+Let $z_i=\mathbf{x}_ i^\intercal \boldsymbol{\beta}$, then $L_i(z_i)$ is a univariate PLQ function. 
 
 
 
@@ -95,7 +95,7 @@ or
 
 $$
 \begin{aligned}
-L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \qquad i=1,2,...,n
+L(z)=\max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \qquad i=1,2,...,n
 \end{aligned}
 \tag{max} 
 $$
