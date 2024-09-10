@@ -3,6 +3,7 @@ from plqcom import PLQLoss, plq_to_rehloss, affine_transformation
 # test SVM on simulated dataset
 import numpy as np
 from rehline import ReHLine
+from rehline import plqERM_Ridge
 
 
 def svm_test():
@@ -15,9 +16,9 @@ def svm_test():
     y = np.sign(X.dot(beta0) + np.random.randn(n))
 
     # Usage 1: build-in loss
-    clf_1 = ReHLine(loss={'name': 'svm'}, C=C)
-    clf_1.make_ReLHLoss(X=X, y=y, loss={'name': 'svm'})
-    clf_1.fit(X=X)
+    clf_1 = plqERM_Ridge(loss={'name': 'svm'})
+    clf_1.C = C
+    clf_1.fit(X=X, y=y)
     print('sol privided by rehline: %s' % clf_1.coef_)
     print(clf_1.decision_function([[.1, .2, .3]]))
 
@@ -26,8 +27,8 @@ def svm_test():
     U = -(C * y).reshape(1, -1)
     L = U.shape[0]
     V = (C * np.array(np.ones(n))).reshape(1, -1)
-    clf_2 = ReHLine(loss={'name': 'svm'}, C=C)
-    clf_2.U, clf_2.V = U, V
+    clf_2 = ReHLine()
+    clf_2.U, clf_2.V, clf_2.C = U, V, C
     clf_2.fit(X=X)
     print('sol privided by rehline: %s' % clf_2.coef_)
     print(clf_2.decision_function([[.1, .2, .3]]))
@@ -38,8 +39,8 @@ def svm_test():
                       cutpoints=np.array([0]))
     rehloss = plq_to_rehloss(plqloss)
     rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
-    clf_3 = ReHLine(loss={'name': 'custom'}, C=C)
-    clf_3.U, clf_3.V = rehloss.relu_coef, rehloss.relu_intercept
+    clf_3 = ReHLine()
+    clf_3.U, clf_3.V, clf_3.C = rehloss.relu_coef, rehloss.relu_intercept, C
     clf_3.fit(X=X)
     print('sol privided by rehline with form custom: %s' % clf_3.coef_)
     print(clf_3.decision_function([[.1, .2, .3]]))
@@ -52,8 +53,8 @@ def svm_test():
                       cutpoints=np.array([1]))
     rehloss = plq_to_rehloss(plqloss)
     rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, y=y, form='classification')
-    clf_4 = ReHLine(loss={'name': 'custom'}, C=C)
-    clf_4.U, clf_4.V = rehloss.relu_coef, rehloss.relu_intercept
+    clf_4 = ReHLine()
+    clf_4.U, clf_4.V, clf_4.C = rehloss.relu_coef, rehloss.relu_intercept, C
     clf_4.fit(X=X)
     print('sol privided by rehline with form affine: %s' % clf_4.coef_)
     print(clf_4.decision_function([[.1, .2, .3]]))
@@ -74,9 +75,8 @@ def ssvm_test():
     y = np.sign(X.dot(beta0) + np.random.randn(n))
 
     # Usage 1: build-in loss
-    clf_1 = ReHLine(loss={'name': 'sSVM'}, C=C)
-    clf_1.make_ReLHLoss(X=X, y=y, loss={'name': 'sSVM'})
-    clf_1.fit(X=X)
+    clf_1 =plqERM_Ridge(loss={'name': 'sSVM'}, C=C)
+    clf_1.fit(X=X, y=y)
     print('sol privided by rehline: %s' % clf_1.coef_)
     print(clf_1.decision_function([[.1, .2, .3]]))
 
@@ -86,8 +86,8 @@ def ssvm_test():
     H = S.shape[0]
     T = (np.sqrt(C) * np.array(np.ones(n))).reshape(1, -1)
     Tau = (np.sqrt(C) * np.array(np.ones(n))).reshape(1, -1)
-    clf_2 = ReHLine(loss={'name': 'sSVM'}, C=C)
-    clf_2.S, clf_2.T, clf_2.Tau = S, T, Tau
+    clf_2 = ReHLine()
+    clf_2.S, clf_2.T, clf_2.Tau, clf_2.C = S, T, Tau, C
     clf_2.fit(X=X)
     print('sol privided by rehline: %s' % clf_2.coef_)
     print(clf_2.decision_function([[.1, .2, .3]]))
@@ -99,8 +99,8 @@ def ssvm_test():
         cutpoints=np.array([0., 1.]))
     rehloss = plq_to_rehloss(plqloss)
     rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=-y, q=1)
-    clf_3 = ReHLine(loss={'name': 'custom'}, C=C)
-    clf_3.S, clf_3.T, clf_3.Tau = rehloss.rehu_coef, rehloss.rehu_intercept, rehloss.rehu_cut
+    clf_3 = ReHLine()
+    clf_3.S, clf_3.T, clf_3.Tau, clf_3.C = rehloss.rehu_coef, rehloss.rehu_intercept, rehloss.rehu_cut, C
     clf_3.fit(X=X)
     print('sol privided by rehline: %s' % clf_3.coef_)
     print(clf_3.decision_function([[.1, .2, .3]]))
@@ -122,13 +122,13 @@ def ridge_regression_test():
     rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
     rehloss_1 = affine_transformation(rehloss, n=X.shape[0], c=1, p=-1, q=y)
     rehloss_2 = affine_transformation(rehloss, n=X.shape[0], c=1, y=y, form='regression')
-    clf_1 = ReHLine(loss={'name': 'custom'}, C=1)
-    clf_1.Tau, clf_1.S, clf_1.T = rehloss_1.rehu_cut, rehloss_1.rehu_coef, rehloss_1.rehu_intercept
+    clf_1 = ReHLine()
+    clf_1.Tau, clf_1.S, clf_1.T, clf_1.C = rehloss_1.rehu_cut, rehloss_1.rehu_coef, rehloss_1.rehu_intercept, 1.0
     clf_1.fit(X=X)
     print('sol privided by rehline: %s' % clf_1.coef_)
 
-    clf_2 = ReHLine(loss={'name': 'custom'}, C=1)
-    clf_2.Tau, clf_2.S, clf_2.T = rehloss_2.rehu_cut, rehloss_2.rehu_coef, rehloss_2.rehu_intercept
+    clf_2 = ReHLine()
+    clf_2.Tau, clf_2.S, clf_2.T, clf_2.C = rehloss_2.rehu_cut, rehloss_2.rehu_coef, rehloss_2.rehu_intercept, 1.0
     clf_2.fit(X=X)
     print('sol privided by rehline: %s' % clf_2.coef_)
     print(np.array_equal(clf_1.Tau, clf_2.Tau))
