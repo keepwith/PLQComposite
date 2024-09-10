@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from rehline import relu, rehu
+from rehline._loss import _relu, _rehu
 
 
 def plot_origin():
@@ -65,12 +65,12 @@ def plot_relu_rehu():
     plt.subplot(1, 2, 1)
     # right
     x_1 = np.linspace(0, 6, 1000)
-    y_1 = np.array(relu(2 * x_1) + relu(6 * x_1 - 6) + rehu(2 * (x_1 - 1), 2) + relu(12 * x_1 - 24))
+    y_1 = np.array(_relu(2 * x_1) + _relu(6 * x_1 - 6) + _rehu(2 * (x_1 - 1), 2) + _relu(12 * x_1 - 24))
     plt.figure()
 
     # left
     x_2 = np.linspace(-6, 0, 1000)
-    y_2 = np.array(relu(-2 * x_2) + relu(-4 * x_2 - 16) + rehu(-np.sqrt(2) * (x_2 + 4), np.inf))
+    y_2 = np.array(_relu(-2 * x_2) + _relu(-4 * x_2 - 16) + _rehu(-np.sqrt(2) * (x_2 + 4), np.inf))
     plt.figure()
     x = np.append(x_2, x_1)
     y = np.append(y_2, y_1)

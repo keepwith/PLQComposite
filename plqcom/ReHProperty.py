@@ -5,7 +5,7 @@
 # License: MIT License
 
 import numpy as np
-from rehline import ReHLoss
+from rehline._loss import ReHLoss
 
 
 def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0, form="custom", y=1):
