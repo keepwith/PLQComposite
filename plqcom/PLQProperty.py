@@ -6,7 +6,7 @@
 
 import numpy as np
 from plqcom import PLQLoss
-from rehline import ReHLoss
+from rehline._loss import ReHLoss
 
 
 def is_continuous(plq_loss):
