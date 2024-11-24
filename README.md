@@ -95,7 +95,7 @@ or
 
 $$
 \begin{aligned}
-L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad i=1,2,...,n
+L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad i=1,2,...,m
 \end{aligned}
 \tag{max} 
 $$
