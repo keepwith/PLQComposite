@@ -44,7 +44,7 @@ Let $z_i=\mathbf{x}_ i^\intercal \boldsymbol{\beta}$, then $L_i(z_i)$ is a univa
 
 $$
 \begin{aligned}
-L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), 
+L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{li} z + v_{li}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}}( s_{hi} z + t_{hi}), 
 \end{aligned}
 \tag{2} 
 $$
@@ -81,9 +81,9 @@ $$
 \begin{aligned}
 L(z)=
 \begin{cases}
-\ a_0 z^2 + b_0 z + c_0, & \text{if } z \leq d_0, \\
-\ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, \ i=1,2,...,n-1 \\
-\ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
+\ a_1 z^2 + b_1 z + c_1, & \text{if } z \leq d_1, \\
+\ a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,3,...,m-1 \\
+\ a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
 \end{cases}
 \end{aligned}
 \tag{plq} 
@@ -95,7 +95,7 @@ or
 
 $$
 \begin{aligned}
-L(z)=\max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \qquad i=1,2,...,n
+L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad i=1,2,...,n
 \end{aligned}
 \tag{max} 
 $$
@@ -108,16 +108,17 @@ $$
 \begin{aligned}
 L(z)=
 \begin{cases}
-\ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
-\ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), \ & \text{if } x_{i-1} < z \leq x_{i}, \ i=2,...,n \\
-\ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n},
+\ q_1  + \frac{q_{2} - q_{1}} { p_{2} - p_{1} } (z - p_{1}), & \text{if } z \leq p_1, \\
+\ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m \\
+\ q_{m-1} + \frac{q_{m-1} - q_{m}} { p_{m-1} - p_{m} } (z - p_{m}), & \text{if } z > p_{m},
 \end{cases}
 \end{aligned}
 \tag{points}
 $$
 
 
-where $\lbrace (x_1,y_1),\ (x_2,y_2),\ ...,\ (x_n, y_n) \rbrace$ is a series of given points and $n\geq 2$   
+where $\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace$ are a series of given points and $m\geq 2$   
+The **points** representation can only express piecewise linear functions.
 
 **Create a PLQ Loss**  
 ```python
