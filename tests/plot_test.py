@@ -93,9 +93,9 @@ def plot_hinge_square():
              # 'weight': 'normal',
              'size': 20,
              }
-    plt.plot(z, L1, marker='o', label='Hinge Loss')
-    plt.plot(z, L2, marker='s', label='Square Loss')
-    plt.plot(z, np.maximum(L1, L2), marker='^', label='PLQ Loss')
+    plt.plot(z, L1, marker='o', label='Hinge Loss', color='#FDEBAA')
+    plt.plot(z, L2, marker='s', label='Square Loss', color='#DBE4FB')
+    plt.plot(z, np.maximum(L1, L2), marker='^', label='PLQ Loss', color='#ABD1BC')
     plt.legend(prop=font1)
     plt.xlabel('z', fontdict=font1)
     plt.ylabel('L(z)', fontdict=font1)
@@ -118,8 +118,8 @@ def plot_fl_fr():
              # 'weight': 'normal',
              'size': 20,
              }
-    plt.plot(z, f_l(z), marker='s', label='f_l')
-    plt.plot(z, f_r(z), marker='o', label='f_r')
+    plt.plot(z, f_l(z), marker='s', label='f_l', color='#08306B')
+    plt.plot(z, f_r(z), marker='o', label='f_r', color='#EDB120')
     plt.legend(prop=font1)
     plt.xlabel('z', fontdict=font1)
     plt.ylabel('L(z)', fontdict=font1)
@@ -131,23 +131,25 @@ def plot_fl_fr():
 
 def plot_relu_rehu_l():
     z = np.linspace(-2, 2, 100)
-
+    z1 = np.linspace(-2, 2, 80)
+    z2 = np.linspace(-2, 2, 60)
+    z3 = np.linspace(-2, 2, 40)
     def f_l(x):
         return np.where(x <= -1, 0.5 * (x - 1) ** 2,
                         np.where(x <= 1, 1 - x,
                                  0))
 
-    relu_1 = _relu(1 - z)
-    relu_2 = _relu(-1 - z)
-    rehu_1 = _rehu(-1 - z, np.inf)
+    relu_1 = _relu(1 - z1)
+    relu_2 = _relu(-1 - z2)
+    rehu_1 = _rehu(-1 - z3, np.inf)
     font1 = {'family': 'Arial',
              # 'weight': 'normal',
              'size': 20,
              }
-    plt.plot(z, f_l(z), marker='s', label='f_l')
-    plt.plot(z, rehu_1, marker='o', label='ReHU 1')
-    plt.plot(z, relu_1, marker='^', label='ReLU 1')
-    plt.plot(z, relu_2, marker='v', label='ReLU 2')
+    plt.plot(z, f_l(z), marker='s', label='f_l', color='#08306B')
+    plt.plot(z1, relu_1, marker='^', label='ReLU 1', color='#2171B5')
+    plt.plot(z2, relu_2, marker='v', label='ReLU 2', color='#6BAED6')
+    plt.plot(z3, rehu_1, marker='o', label='ReHU 1', color='#C6DBEF')
     plt.legend(prop=font1)
     plt.xlabel('z', fontdict=font1)
     plt.ylabel('L(z)', fontdict=font1)
@@ -159,17 +161,17 @@ def plot_relu_rehu_l():
 
 def plot_relu_rehu_r():
     z = np.linspace(-2, 2, 100)
-
+    z1 = np.linspace(-2, 2, 50)
     def f_r(x):
         return np.where(x >= 1, 0.5 * (x - 1) ** 2, 0)
 
-    rehu_2 = _rehu(-1 + z, np.inf)
+    rehu_2 = _rehu(-1 + z1, np.inf)
     font1 = {'family': 'Arial',
              # 'weight': 'normal',
              'size': 20,
              }
-    plt.plot(z, f_r(z), marker='s', label='f_r')
-    plt.plot(z, rehu_2, marker='o', label='ReHU 2')
+    plt.plot(z, f_r(z), marker='o', label='f_r', color='#EDB120')
+    plt.plot(z1, rehu_2, marker='s', label='ReHU 2', color='#FED976')
     plt.legend(prop=font1)
     plt.xlabel('z', fontdict=font1)
     plt.ylabel('L(z)', fontdict=font1)
