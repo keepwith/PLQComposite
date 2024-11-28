@@ -205,7 +205,7 @@ def plq_to_rehloss(plq_loss):
     rehu_intercept_r = -np.sqrt(2 * quad_coef_r['a']) * cutpoints_r[:-1]
     cut_diff_r = np.diff(cutpoints_r)[quad_coef_r['a'] != 0]
     quad_coef_r['a'] = quad_coef_r['a'][quad_coef_r['a'] != 0]
-    rehu_cut_r = np.sqrt(2 * quad_coef_r['a'] * cut_diff_r)
+    rehu_cut_r = np.sqrt(2 * quad_coef_r['a'] )* cut_diff_r
 
     rehu_intercept_r = rehu_intercept_r[rehu_coef_r != 0]
     rehu_coef_r = rehu_coef_r[rehu_coef_r != 0]
@@ -227,7 +227,7 @@ def plq_to_rehloss(plq_loss):
     rehu_intercept_l = np.sqrt(2 * quad_coef_l['a']) * cutpoints_l[:-1]
     cut_diff_l = (cutpoints_l[:-1] - cutpoints_l[1:])[quad_coef_l['a'] != 0]
     quad_coef_l['a'] = quad_coef_l['a'][quad_coef_l['a'] != 0]
-    rehu_cut_l = np.sqrt(2 * quad_coef_l['a'] * cut_diff_l)
+    rehu_cut_l = np.sqrt(2 * quad_coef_l['a']) * cut_diff_l
 
     rehu_intercept_l = rehu_intercept_l[rehu_coef_l != 0]
     rehu_coef_l = rehu_coef_l[rehu_coef_l != 0]

@@ -4,6 +4,8 @@ from holoviews.plotting.bokeh.styles import font_size
 
 from rehline._loss import _relu, _rehu
 
+from plqcom import PLQLoss, plq_to_rehloss
+
 
 def plot_origin():
     plt.figure()
@@ -105,6 +107,7 @@ def plot_hinge_square():
 
     return plt
 
+
 def plot_fl_fr():
     z = np.linspace(-2, 2, 100)
 
@@ -112,8 +115,10 @@ def plot_fl_fr():
         return np.where(x <= -1, 0.5 * (x - 1) ** 2,
                         np.where(x <= 1, 1 - x,
                                  0))
+
     def f_r(x):
         return np.where(x >= 1, 0.5 * (x - 1) ** 2, 0)
+
     font1 = {'family': 'Arial',
              # 'weight': 'normal',
              'size': 20,
@@ -129,11 +134,13 @@ def plot_fl_fr():
 
     return plt
 
+
 def plot_relu_rehu_l():
     z = np.linspace(-2, 2, 100)
     z1 = np.linspace(-2, 2, 80)
     z2 = np.linspace(-2, 2, 60)
     z3 = np.linspace(-2, 2, 40)
+
     def f_l(x):
         return np.where(x <= -1, 0.5 * (x - 1) ** 2,
                         np.where(x <= 1, 1 - x,
@@ -159,9 +166,11 @@ def plot_relu_rehu_l():
 
     return plt
 
+
 def plot_relu_rehu_r():
     z = np.linspace(-2, 2, 100)
     z1 = np.linspace(-2, 2, 50)
+
     def f_r(x):
         return np.where(x >= 1, 0.5 * (x - 1) ** 2, 0)
 
@@ -181,14 +190,26 @@ def plot_relu_rehu_r():
 
     return plt
 
+
+# if __name__ == '__main__':
+#     plt.figure(figsize=(16, 12), dpi=1200)
+#     plt.subplot(2, 2, 1)
+#     plot_hinge_square()
+#     plt.subplot(2, 2, 2)
+#     plot_fl_fr()
+#     plt.subplot(2, 2, 3)
+#     plot_relu_rehu_l()
+#     plt.subplot(2, 2, 4)
+#     plot_relu_rehu_r()
+#     plt.savefig('../figs/PLQ.png', bbox_inches='tight', dpi=1200)
+
+
 if __name__ == '__main__':
-    plt.figure(figsize=(16, 12), dpi=1200)
-    plt.subplot(2, 2, 1)
-    plot_hinge_square()
-    plt.subplot(2, 2, 2)
-    plot_fl_fr()
-    plt.subplot(2, 2, 3)
-    plot_relu_rehu_l()
-    plt.subplot(2, 2, 4)
-    plot_relu_rehu_r()
-    plt.savefig('../figs/PLQ.png', bbox_inches='tight', dpi=1200)
+    plqloss = PLQLoss(quad_coef={'a': np.array([1., 0., 0., 2., 0.]), 'b': np.array([2., -2. , 2., 4., 24.]), 'c': np.array(
+        [0., 0., 0., -4.,-36.])}, cutpoints = np.array([-4., 0., 1.,2.]))
+    rehloss = plq_to_rehloss(plqloss)
+    print(rehloss.relu_coef)
+    print(rehloss.relu_intercept)
+    print(rehloss.rehu_coef)
+    print(rehloss.rehu_intercept)
+    print(rehloss.rehu_cut)
