@@ -74,6 +74,8 @@ In general, to solve the ERM problem using **plqcom** and **reline**, follow the
 We consider three distinct representations of the PLQ functions, which are enumerated as follows. 
 
 **plq**: specifying the coefficients of each piece with cutoffs.
+
+
 $$
 \begin{aligned}
 L(z)=
@@ -150,7 +152,7 @@ where $C_i>0$ is the sample weight for the $i$-th instance, and $p_i$ and $q_i$ 
 
 
   $$
-  L_i( \mathbf{x}_i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i \mathbf{x}_i^\intercal \boldsymbol{\beta});
+  L_i( \mathbf{x} _i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i \mathbf{x} _i^\intercal \boldsymbol{\beta});
   $$
   
   
@@ -158,7 +160,7 @@ where $C_i>0$ is the sample weight for the $i$-th instance, and $p_i$ and $q_i$ 
 
 
   $$
-  L_i( \mathbf{x}_i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i - \mathbf{x}_i^\intercal \boldsymbol{\beta}).
+  L_i( \mathbf{x} _i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i - \mathbf{x} _i^\intercal \boldsymbol{\beta}).
   $$
   
   
