@@ -13,4 +13,4 @@ sphinx_autodoc_typehints
 sphinx-press-theme
 sphinx_gallery
 sphinx-autoapi
-renku_sphinx_theme
+furo
