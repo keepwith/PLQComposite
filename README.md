@@ -151,17 +151,17 @@ where $C_i>0$ is the sample weight for the $i$-th instance, and $p_i$ and $q_i$ 
 - for classification problems:
 
 
-  $$
-  L_{i}( \mathbf{x}_{i}^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i \mathbf{x}_{i}^\intercal \boldsymbol{\beta});
-  $$
+$$
+  L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
+$$
   
   
 - for regression problems:
 
 
-  $$
-  L_{i}( \mathbf{x}_{i}^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i - \mathbf{x}_{i}^\intercal \boldsymbol{\beta}).
-  $$
+$$
+  L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
+$$
   
   
 
