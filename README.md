@@ -22,10 +22,7 @@
 ## Introduction
  
 
-**Empirical risk minimization (ERM)[2]** is a crucial framework that offers a general approach to handling a broad range of machine learning tasks. 
-
-Given a general regularized ERM problem based on a convex **piecewise linear-quadratic(PLQ) loss** with the form $(1)$ below.
-
+**Empirical Risk Minimization (ERM)**[3] is a fundamental framework that provides a general methodology for addressing a wide variety of machine learning tasks. In many machine learning ERM problems, loss functions can be represented as **piecewise linear-quadratic (PLQ)** functions. Specifically, the formulation given a PLQ loss function $L_i(\cdot): \mathbb{R} \rightarrow \mathbb{R}^{+}_{0}$ is as follows:
 
 $$
 \begin{aligned}
@@ -35,11 +32,10 @@ $$
 $$
 
 
-Let $z_i=\mathbf{x}_ i^\intercal \boldsymbol{\beta}$, then $L_i(z_i)$ is a univariate PLQ function. 
+where $\mathbf{x}_{i} \in \mathbb{R}^d$ is the feature vector for the $i$-th observation, and $\boldsymbol{\beta} \in \mathbb{R}^d$ is an unknown coefficient vector. 
 
 
-
-**PLQ Composite Decomposition** is designed to be a computational software package which adopts a **two-step method** (**decompose** and **broadcast**) convert an arbitrary convex PLQ loss function in $(1)$ to a **composite ReLU-ReHU Loss** function with the form $(2)$ below. 
+Our objective is to transform the form of the PLQ loss function $L_i(\cdot)$ in $(1)$ into the sum of a finite number of **rectified linear units (ReLU)** [2] and **rectified Huber units (ReHU)** [1] as follows. 
 
 
 $$
@@ -49,10 +45,10 @@ L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{li} z + v_{li}) + \sum_{h=1}^H {\text{ReHU}}
 \tag{2} 
 $$
 
-where $u_{l},v_{l}$ and $s_{h},t_{h},\tau_{h}$ are the ReLU-ReHU loss parameters.
-The **ReLU** and **ReHU** functions are defined as 
+where $u_{li},v_{li}$ and $s_{hi},t_{hi},\tau_{hi}$ are the ReLU-ReHU loss parameters for $L(\cdot)$, and the ReLU and ReHU functions are defined as
 
 $$\mathrm{ReLU}(z)=\max(z,0).$$ 
+
 
 and
 
@@ -72,11 +68,12 @@ Finally, users can utilize <a href ="https://github.com/softmin/ReHLine">ReHLine
 
 
 ## Usage
-Generally Speaking, Utilize the plq composite to solve the ERM problem need three steps below. For details of these functions you can check the API.  
+In general, to solve the ERM problem using **plqcom** and **reline**, follow the four steps outlined below. For specific details about these functions, please refer to the API documentation.
 
-### 1) Create a PLQ Loss and Decompose  
-Three types of input for PLQ Loss are accepted in this package. One is the coefficients of each piece with cutoffs (named **plq**, default form), another is the coefficients only and takes the maximum of each piece named **max**, the other is the linear version based on a series of given points (named **points**). The explicit definitions of plq, max and points are shown below.  
+### 1) Representation of PLQ functions
+We consider three distinct representations of the PLQ functions, which are enumerated as follows. 
 
+**plq**: specifying the coefficients of each piece with cutoffs.
 $$
 \begin{aligned}
 L(z)=
@@ -90,18 +87,18 @@ L(z)=
 $$
 
 
-or 
+**max**: specifying the coefficients of a series of quadratic functions and taking the pointwise maximum of each function.
 
 
 $$
 \begin{aligned}
-L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad i=1,2,...,m
+L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad
 \end{aligned}
 \tag{max} 
 $$
 
 
-or 
+**points**: constructing piecewise linear functions based on a series of given points.
 
 
 $$
@@ -109,7 +106,7 @@ $$
 L(z)=
 \begin{cases}
 \ q_1  + \frac{q_{2} - q_{1}} { p_{2} - p_{1} } (z - p_{1}), & \text{if } z \leq p_1, \\
-\ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m \\
+\ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
 \ q_{m-1} + \frac{q_{m-1} - q_{m}} { p_{m-1} - p_{m} } (z - p_{m}), & \text{if } z > p_{m},
 \end{cases}
 \end{aligned}
@@ -117,8 +114,7 @@ L(z)=
 $$
 
 
-where $\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace$ are a series of given points and $m\geq 2$   
-The **points** representation can only express piecewise linear functions.
+where $\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace$ are a series of given points and $m\geq 2$. The **points** representation can only express piecewise linear functions.
 
 **Create a PLQ Loss**  
 ```python
@@ -132,21 +128,45 @@ plqloss2 = PLQLoss(quad_coef={'a': np.array([0., 0., 0.5]), 'b': np.array([0., -
 plqloss3 = PLQLoss(points=np.array([[-3, 0], [0, 0], [1, 1], [2, 2]]), form="points")
 ```
 
-Then call **plq_to_rehloss** method to decompose it to form $(2)$  
+### 2) Decompose to ReLU-ReHU representation
+We can call **plq_to_rehloss** method to decompose it to form $(2)$.  
 ```python
 from plqcom import plq_to_rehloss
 rehloss = plq_to_rehloss(plqloss1)
 ```
 
-### 2) Broadcast to all Samples
-Usually, there exists a special relationship between each $L_{i}$
-$$L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}).$$  
-For Regression Problems, $L_i(z_i)=c_{i}L(y_{i}-z_{i})$.   
-For Classification Problems, $L_i(z_i)=c_{i}L(y_{i}z_{i})$.  
+### 3) Affine casting
+Note that, in practice, $L_i(\cdot)$ in $(1)$ can typically be obtained through affine transformation of a single *prototype loss* $L(\cdot)$, that is,
 
-You call **affine_transformation** method to broadcast by specifying $p_{i}$ and $q_{i}$ or just input form='regression' or 'classification'. You should be very careful when directly specify the forms. 
 
-If the special relationship does not exist in your task, you can also manually repeat stage 1 and combines all the rehloss together and then use rehline to solve the problem.  
+$$
+  L_i(z) = C_i L(p_i z + q_i),
+$$
+
+
+where $C_i>0$ is the sample weight for the $i$-th instance, and $p_i$ and $q_i$ are constants. For example,
+
+- for classification problems:
+
+
+  $$
+  L_i( \mathbf{x}_i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i \mathbf{x}_i^\intercal \boldsymbol{\beta});
+  $$
+  
+  
+- for regression problems:
+
+
+  $$
+  L_i( \mathbf{x}_i^\intercal \boldsymbol{\beta} ) = C_{i}L(y_i - \mathbf{x}_i^\intercal \boldsymbol{\beta}).
+  $$
+  
+  
+
+
+Utilize the **affine_transformation** method to broadcast by providing $p_i$ and $q_i$, or by simply indicating the input form as 'regression' or 'classification'. You should be careful when directly specifying these forms.
+
+If the specific relationship does not apply to your task, you may manually repeat stage 1 and 2. Then, combine all the rehloss together and use **rehline** to address the problem.  
 
 ```python
 from plqcom import affine_transformation
@@ -156,7 +176,7 @@ rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
 rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification')
 ```
 
-### 3) Use Rehline solve the problem
+### 4) Use Rehline solve the problem
 ``` python
 from rehline import ReHLine
 clf = ReHLine(loss={'name': 'custom'}, C=C)
@@ -178,7 +198,9 @@ print('sol privided by rehline: %s' % clf.coef_)
 
 ## References
 
-- [1]  Dai, B., & Qiu, Y. (2023, November). ReHLine: Regularized Composite ReLU-ReHU Loss Minimization  with Linear Computation and Linear Convergence. In *Thirty-seventh Conference on Neural Information Processing Systems*.
-- [2]  Vapnik, V. (1991). Principles of risk minimization for learning theory. In *Advances in Neural Information Processing Systems*, pages 831–838.
+- [1]  Dai B, Qiu Y (2024). ReHLine: regularized composite ReLU-ReHU loss minimization with linear computation and linear convergence. *Advances in Neural Information Processing Systems (NIPS)*, 36.
+- [2] Fukushima K (1969). Visual feature extraction by a multilayered network of analog threshold elements. *IEEE Transactions on Systems Science and Cybernetics*, 5(4): 322–333.
+- [3]  Vapnik, V. (1991). Principles of risk minimization for learning theory. In *Advances in Neural Information Processing Systems*, pages 831–838.
+
 
 [Return to top](#PLQ-Composite-Decomposition)
