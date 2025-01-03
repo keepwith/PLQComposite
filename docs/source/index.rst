@@ -27,34 +27,43 @@ Contents
 Introduction
 ------------
 
-**Empirical risk minimization (ERM)[2]** is a crucial framework that
-offers a general approach to handling a broad range of machine learning
-tasks.
+**Empirical Risk Minimization (ERM)**\ [3] is a fundamental framework
+that provides a general methodology for addressing a wide variety of
+machine learning tasks. In many machine learning ERM problems, loss
+functions can be represented as **piecewise linear-quadratic (PLQ)**
+functions. Specifically, the formulation given a PLQ loss function
+:math:`L_i(\cdot): \mathbb{R} \rightarrow \mathbb{R}^{+}_{0}` is as
+follows:
 
-Given a general regularized ERM problem based on a convex **piecewise
-linear-quadratic(PLQ) loss** with the form :math:`(1)` below.
+.. math::
+
+
+   \begin{aligned}
+   \min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \boldsymbol{\beta}) + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},
+   \end{aligned}
+   \tag{1}
+
+where :math:`\mathbf{x}_{i} \in \mathbb{R}^d` is the feature vector for
+the :math:`i`-th observation, and
+:math:`\boldsymbol{\beta} \in \mathbb{R}^d` is an unknown coefficient
+vector.
+
+Our objective is to transform the form of the PLQ loss function
+:math:`L_i(\cdot)` in :math:`(1)` into the sum of a finite number of
+**rectified linear units (ReLU)** [2] and **rectified Huber units
+(ReHU)** [1] as follows.
 
 .. math::
 
 
-   \min_{\mathbf{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \mathbf{\beta}) + \frac{1}{2} \Vert \mathbf{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \mathbf{\beta} + \mathbf{b} \geq \mathbf{0},   \tag{1}
+   \begin{aligned}
+   L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{li} z + v_{li}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}}( s_{hi} z + t_{hi}),
+   \end{aligned}
+   \tag{2}
 
-Let :math:`z_i=\mathbf{x}_ i^\intercal \mathbf{\beta}`, then
-:math:`L_i(z_i)` is a univariate PLQ function.
-
-**PLQ Composite Decomposition** is designed to be a computational
-software package which adopts a **two-step method** (**decompose** and
-**broadcast**) convert an arbitrary convex PLQ loss function in
-:math:`(1)` to a **composite ReLU-ReHU Loss** function with the form
-:math:`(2)` below.
-
-.. math::
-
-   L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{l} z + v_{l}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{h}}( s_{h} z + t_{h}), \tag{2}
-
-where :math:`u_{l},v_{l}` and :math:`s_{h},t_{h},\tau_{h}` are the
-ReLU-ReHU loss parameters. The **ReLU** and **ReHU** functions are
-defined as
+where :math:`u_{li},v_{li}` and :math:`s_{hi},t_{hi},\tau_{hi}` are the
+ReLU-ReHU loss parameters for :math:`L(\cdot)`, and the ReLU and ReHU
+functions are defined as
 
 .. math:: \mathrm{ReLU}(z)=\max(z,0).
 
@@ -76,55 +85,61 @@ package to solve the ERM problem.
 Usage
 -----
 
-Generally Speaking, Utilize the plq composite to solve the ERM problem
-need three steps below. For details of these functions you can check the
-API.
+In general, to solve the ERM problem using **plqcom** and **reline**,
+follow the four steps outlined below. For specific details about these
+functions, please refer to the API documentation.
 
-1) Create a PLQ Loss and Decompose
+1) Representation of PLQ functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Three types of input for PLQ Loss are accepted in this package. One is
-the coefficients of each piece with cutoffs (named **plq**, default
-form), another is the coefficients only and takes the maximum of each
-piece named **max**, the other is the linear version based on a series
-of given points (named **points**). The explicit definitions of plq, max
-and points are shown below.
+We consider three distinct representations of the PLQ functions, which
+are enumerated as follows.
+
+**plq**: specifying the coefficients of each piece with cutoffs.
 
 .. math::
+
+
    \begin{equation}
    \tag{plq}
    L(z)=
    \begin{cases}
-   \ a_0 z^2 + b_0 z + c_0, & \text{if } z \leq d_0, \\
-   \ a_i z^2 + b_i z + c_i, & \text{if } d_{i-1} < z \leq d_{i}, \ i=1,2,...,n-1 \\
-   \ a_n z^2 + b_n z + c_n, & \text{if } z > d_{n-1}.
+   \ a_1 z^2 + b_1 z + c_1, & \text{if } z \leq d_1, \\
+   \ a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,3,...,m-1 \\
+   \ a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
    \end{cases}
    \end{equation}
 
-or
+**max**: specifying the coefficients of a series of quadratic functions
+and taking the pointwise maximum of each function.
 
 .. math::
 
-   \begin{equation}
+
+   \begin{aligned}
+   L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad
+   \end{aligned}
    \tag{max}
-   L(z)=max \lbrace a_{i} z^2 + b_{i} z + c_{i} \rbrace. \quad i=1,2,...,n
-   \end{equation}
 
-or
+**points**: constructing piecewise linear functions based on a series of
+given points.
 
 .. math::
+
+
    \begin{equation}
    \tag{points}
    L(z)=
    \begin{cases}
-   \ y_1  + \frac{y_{2} - y_{1}} { x_{2} - x_{1} } (z - x_{1}), & \text{if } z \leq x_1, \\
-   \ y_{i-1} + \frac{y_{i} - y_{i-1}} { x_{i} - x_{i-1} } (z - x_{i-1}), & \text{if } x_{i-1} < z \leq x_{i}, \ i=2,...,n \\
-   \ y_{n-1} + \frac{y_{n-1} - y_{n}} { x_{n-1} - x_{n} } (z - x_{n}), & \text{if } z > x_{n},
+   \ q_1  + \frac{q_{2} - q_{1}} { p_{2} - p_{1} } (z - p_{1}), & \text{if } z \leq p_1, \\
+   \ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
+   \ q_{m-1} + \frac{q_{m-1} - q_{m}} { p_{m-1} - p_{m} } (z - p_{m}), & \text{if } z > p_{m},
    \end{cases}
    \end{equation}
 
-where :math:`\lbrace (x_1,y_1),\ (x_2,y_2),\ ...,\ (x_n, y_n) \rbrace`
-is a series of given points and :math:`n\geq 2`
+where :math:`\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace`
+are a series of given points and :math:`m\geq 2`. The **points**
+representation can only express piecewise linear functions.
 
 **Create a PLQ Loss**
 
@@ -139,31 +154,54 @@ is a series of given points and :math:`n\geq 2`
    # points
    plqloss3 = PLQLoss(points=np.array([[-3, 0], [0, 0], [1, 1], [2, 2]]), form="points")
 
-Then call **plq_to_rehloss** method to decompose it to form :math:`(2)`
+2) Decompose to ReLU-ReHU representation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We can call **plq_to_rehloss** method to decompose it to form
+:math:`(2)`.
 
 .. code:: python
 
    from plqcom import plq_to_rehloss
    rehloss = plq_to_rehloss(plqloss1)
 
-2) Broadcast to all Samples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3) Affine casting
+~~~~~~~~~~~~~~~~~
 
-| Usually, there exists a special relationship between each
-  :math:`L_{i}`
+Note that, in practice, :math:`L_i(\cdot)` in :math:`(1)` can typically
+be obtained through affine transformation of a single *prototype loss*
+:math:`L(\cdot)`, that is,
 
-  .. math:: L_i(z_i)=c_{i}L(p_{i}z_{i}+q_{i}).
-| For Regression Problems, :math:`L_i(z_i)=c_{i}L(y_{i}-z_{i})`.
-| For Classification Problems, :math:`L_i(z_i)=c_{i}L(y_{i}z_{i})`.
+.. math::
 
-You call **affine_transformation** method to broadcast by specifying
-:math:`p_{i}` and :math:`q_{i}` or just input form=‘regression’ or
-‘classification’. You should be very careful when directly specify the
-forms.
 
-If the special relationship does not exist in your task, you can also
-manually repeat stage 1 and combines all the rehloss together and then
-use rehline to solve the problem.
+     L_i(z) = C_i L(p_i z + q_i),
+
+where :math:`C_i>0` is the sample weight for the :math:`i`-th instance,
+and :math:`p_i` and :math:`q_i` are constants. For example,
+
+-  for classification problems:
+
+.. math::
+
+
+     L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
+
+-  for regression problems:
+
+.. math::
+
+
+     L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
+
+Utilize the **affine_transformation** method to broadcast by providing
+:math:`p_i` and :math:`q_i`, or by simply indicating the input form as
+‘regression’ or ‘classification’. You should be careful when directly
+specifying these forms.
+
+If the specific relationship does not apply to your task, you may
+manually repeat stage 1 and 2. Then, combine all the rehloss together
+and use **rehline** to address the problem.
 
 .. code:: python
 
@@ -173,7 +211,7 @@ use rehline to solve the problem.
    # form = 'classification'
    rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification')
 
-3) Use Rehline solve the problem
+4) Use Rehline solve the problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
@@ -188,7 +226,9 @@ Examples and Notebooks
 ----------------------
 
 -  `Hinge and Square
-   loss <https://github.com/keepwith/PLQComposite/blob/main/examples/ex1_hinge_square.ipynb>`__
+   loss <https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing>`__
+-  `Portfilio
+   Optimization <https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing>`__
 -  `SVM <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__
 -  `Ridge
    Regression <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__
@@ -196,11 +236,13 @@ Examples and Notebooks
 References
 ----------
 
--  [1] Dai, B., & Qiu, Y. (2023, November). ReHLine: Regularized
-   Composite ReLU-ReHU Loss Minimization with Linear Computation and
-   Linear Convergence. In *Thirty-seventh Conference on Neural
-   Information Processing Systems*.
--  [2] Vapnik, V. (1991). Principles of risk minimization for learning
+-  [1] Dai B, Qiu Y (2024). ReHLine: regularized composite ReLU-ReHU
+   loss minimization with linear computation and linear convergence.
+   *Advances in Neural Information Processing Systems (NIPS)*, 36.
+-  [2] Fukushima K (1969). Visual feature extraction by a multilayered
+   network of analog threshold elements. *IEEE Transactions on Systems
+   Science and Cybernetics*, 5(4): 322–333.
+-  [3] Vapnik, V. (1991). Principles of risk minimization for learning
    theory. In *Advances in Neural Information Processing Systems*, pages
    831–838.
 
