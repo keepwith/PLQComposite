@@ -291,16 +291,16 @@ All runnable notebooks are collected on the :doc:`examples` page (sidebar:
 
 -  :doc:`ex1: Hinge–Square <notebooks/ex1_hinge_square>`
    — custom composite classification; low-level ``ReHLine`` API only
-   (`Colab mirror <https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing>`__)
+   (`source <https://github.com/keepwith/PLQComposite/blob/main/examples/ex1_hinge_square.ipynb>`__)
 -  :doc:`ex2: SVM <notebooks/ex2_svm>`
    — plqcom decomposition and ``plq_Ridge_Classifier``
-   (`GitHub mirror <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__)
+   (`source <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__)
 -  :doc:`ex3: Ridge Regression <notebooks/ex3_regression>`
    — plqcom decomposition and ``plq_Ridge_Regressor``
-   (`GitHub mirror <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__)
+   (`source <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__)
 -  :doc:`ex4: Portfolio <notebooks/ex4_portfolio>`
    — PLQ from points with linear constraints (``_A``, ``_b``)
-   (`Colab mirror <https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing>`__)
+   (`source <https://github.com/keepwith/PLQComposite/blob/main/examples/ex4_portfolio.ipynb>`__)
 
 Citation
 --------

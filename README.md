@@ -238,10 +238,10 @@ See the [ReHLine-python](https://github.com/softmin/ReHLine-python) documentatio
 
 | Notebook | Description |
 |----------|-------------|
-| [ex1: Hinge–Square](https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing) | Custom composite classification loss; low-level `ReHLine` API only |
+| [ex1: Hinge–Square](https://github.com/keepwith/PLQComposite/blob/main/examples/ex1_hinge_square.ipynb) | Custom composite classification loss; low-level `ReHLine` API only |
 | [ex2: SVM](https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb) | Hinge SVM via plqcom decomposition **and** `plq_Ridge_Classifier` |
 | [ex3: Ridge Regression](https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb) | MSE / ridge via plqcom **and** `plq_Ridge_Regressor` |
-| [ex4: Portfolio](https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing) | PLQ from points + linear constraints (`_A`, `_b`) |
+| [ex4: Portfolio](https://github.com/keepwith/PLQComposite/blob/main/examples/ex4_portfolio.ipynb) | PLQ from points + linear constraints (`_A`, `_b`) |
 
 Source notebooks live in `examples/` and are mirrored under `docs/source/notebooks/` for Sphinx.
 
