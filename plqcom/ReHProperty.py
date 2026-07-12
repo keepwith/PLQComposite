@@ -30,14 +30,10 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0, form="custom", y
         number of samples
 
     form: str, default='custom'
-        the form of affine transformation
-        'custom' for custom form
-            In this form, the c, p, q can be either a number or an array
-        'classification' for classification form
-            In this form, $L_i = c_iL(y_i z_i)$, i.e. p=y_i, q=0
-        'regression' for regression form
-            In this form, $L_i = c_iL(y_i - z_i)$, i.e. p=-1, q=y
-            should be very careful when specify the original L and parameters
+        Affine transformation form: ``'custom'``, ``'classification'``, or ``'regression'``.
+        For ``'custom'``, ``c``, ``p``, and ``q`` can be scalars or arrays.
+        For ``'classification'``, use ``L_i = c_i L(y_i z_i)`` (``p=y_i``, ``q=0``).
+        For ``'regression'``, use ``L_i = c_i L(y_i - z_i)`` (``p=-1``, ``q=y``).
 
     y: {array_like} of shape (n_samples,), default=None, only required when form is 'classification' or 'regression'
         the label of the samples

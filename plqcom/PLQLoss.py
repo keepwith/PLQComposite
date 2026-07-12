@@ -22,20 +22,11 @@ class PLQLoss(object):
         The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'
-        The form of the input PLQ function.
-
-        'plq' for the PLQ form
-            In this form, cutpoints must be given explicitly.
-
-        'max' for the max form
-            The max form is a special form of the PLQ function, which is the pointwise maximum of several linear or
-            quadratic functions.
-            The cutpoints are not necessary in this form, since they will be automatically calculated.
-
-        'points' for the piecewise linear form based on given points
-            The piecewise linear form is a special form of the PLQ function, which is the piecewise linear function.
-            The function will connect the given points to form a piecewise linear loss.
-            For the first piece and the last piece related to infinity, they will be the same as their adjacent piece.
+        Input form of the PLQ function: ``'plq'``, ``'max'``, or ``'points'``.
+        For ``'plq'``, cutpoints must be given explicitly.
+        For ``'max'``, cutpoints are computed from the pointwise maximum of quadratics.
+        For ``'points'``, the function is piecewise linear through the given points;
+        the first and last pieces extend the adjacent segments.
 
     cutpoints : {array-like} of float, optional, default: None
         cutpoints of the PLQLoss, except -np.inf and np.inf

@@ -22,7 +22,7 @@ copyright = '2024, Tingxian Gao'
 author = 'Tingxian Gao'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.1.0'
 
 import os
 import sys
@@ -51,6 +51,8 @@ extensions = [
     'sphinx_gallery.load_style',
 ]
 autoapi_dirs = ['../../plqcom']
+autoapi_ignore = ['__init__.py']
+autoapi_python_module_content = 'module'
 autosummary_generate = True
 numpydoc_show_class_members = False
 nbsphinx_execute = 'never'
@@ -75,3 +77,13 @@ html_theme = 'furo'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+
+def setup(app):
+    import logging
+
+    class _SuppressKnownDocWarnings(logging.Filter):
+        def filter(self, record):
+            return 'duplicate object description of plqcom.PLQLoss' not in record.getMessage()
+
+    logging.getLogger('sphinx').addFilter(_SuppressKnownDocWarnings())

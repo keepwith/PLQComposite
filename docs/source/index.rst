@@ -41,14 +41,16 @@ follows:
 
 
    \begin{aligned}
-   \min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \boldsymbol{\beta}) + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},
+   \min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta})
+   + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},
    \end{aligned}
    \tag{1}
 
 where :math:`\mathbf{x}_{i} \in \mathbb{R}^d` is the feature vector for
-the :math:`i`-th observation, and
-:math:`\boldsymbol{\beta} \in \mathbb{R}^d` is an unknown coefficient
-vector.
+the :math:`i`-th observation, :math:`\boldsymbol{\beta} \in \mathbb{R}^d`
+is an unknown coefficient vector, and :math:`\mathbf{A} \in \mathbb{R}^{K \times d}`,
+:math:`\mathbf{b} \in \mathbb{R}^{K}` define optional linear inequality
+constraints (e.g. portfolio optimization; see ``ex4_portfolio.ipynb``).
 
 Our objective is to transform the form of the PLQ loss function
 :math:`L_i(\cdot)` in :math:`(1)` into the sum of a finite number of
@@ -64,10 +66,10 @@ Our objective is to transform the form of the PLQ loss function
    \tag{2}
 
 where :math:`u_{li},v_{li}` and :math:`s_{hi},t_{hi},\tau_{hi}` are the
-ReLU-ReHU loss parameters for :math:`L(\cdot)`, and the ReLU and ReHU
+ReLU-ReHU loss parameters for :math:`L_i(\cdot)`, and the ReLU and ReHU
 functions are defined as
 
-.. math:: \mathrm{ReLU}(z)=\max(z,0).
+.. math:: \mathrm{ReLU}(z) = \max(z,0).
 
 and
 
@@ -101,25 +103,25 @@ are enumerated as follows.
 
 .. math::
 
-
-   \begin{equation}
-   \tag{plq}
+   \begin{aligned}
    L(z)=
    \begin{cases}
    \ a_1 z^2 + b_1 z + c_1, & \text{if } z \leq d_1, \\
-   \ a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,3,...,m-1 \\
+   \qquad \cdots \\
+   \ a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,...,m-1, \\
+   \qquad \cdots \\
    \ a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
    \end{cases}
-   \end{equation}
+   \end{aligned}
+   \tag{plq}
 
 **max**: specifying the coefficients of a series of quadratic functions
 and taking the pointwise maximum of each function.
 
 .. math::
 
-
    \begin{aligned}
-   L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad
+   L(z)= \max_{j=1,2,...m} \left( a_{j} z^2 + b_{j} z + c_{j} \right).
    \end{aligned}
    \tag{max}
 
@@ -128,18 +130,19 @@ given points.
 
 .. math::
 
-
-   \begin{equation}
-   \tag{points}
+   \begin{aligned}
    L(z)=
    \begin{cases}
    \ q_1  + \frac{q_{2} - q_{1}} { p_{2} - p_{1} } (z - p_{1}), & \text{if } z \leq p_1, \\
-   \ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
-   \ q_{m-1} + \frac{q_{m-1} - q_{m}} { p_{m-1} - p_{m} } (z - p_{m}), & \text{if } z > p_{m},
+   \qquad \cdots \\
+   \ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
+   \qquad \cdots \\
+   \ q_{m} + \frac{q_{m} - q_{m-1}} { p_{m} - p_{m-1} } (z - p_{m}), & \text{if } z > p_{m},
    \end{cases}
-   \end{equation}
+   \end{aligned}
+   \tag{points}
 
-where :math:`\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace`
+where :math:`\lbrace (p_1,q_1), (p_2,q_2), ..., (p_m, q_m) \rbrace`
 are a series of given points and :math:`m\geq 2`. The **points**
 representation can only express piecewise linear functions.
 
@@ -187,14 +190,14 @@ and :math:`p_i` and :math:`q_i` are constants. For example,
 .. math::
 
 
-     L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
+     L_{i} ( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
 
 -  for regression problems:
 
 .. math::
 
 
-     L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
+     L_{i} ( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
 
 Utilize the **affine_transformation** method to broadcast by providing
 :math:`p_i` and :math:`q_i`, or by simply indicating the input form as

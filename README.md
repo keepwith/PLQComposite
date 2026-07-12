@@ -27,13 +27,13 @@
 
 $$
 \begin{aligned}
-\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^\intercal \boldsymbol{\beta}) + \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},   
+\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta})
++ \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},
 \end{aligned}
-\tag{1}
 $$
 
 
-where $\mathbf{x}_{i} \in \mathbb{R}^d$ is the feature vector for the $i$-th observation, and $\boldsymbol{\beta} \in \mathbb{R}^d$ is an unknown coefficient vector. 
+where $\mathbf{x}_{i} \in \mathbb{R}^d$ is the feature vector for the $i$-th observation, $\boldsymbol{\beta} \in \mathbb{R}^d$ is an unknown coefficient vector, and $\mathbf{A} \in \mathbb{R}^{K \times d}$, $\mathbf{b} \in \mathbb{R}^{K}$ define optional linear inequality constraints (e.g. portfolio optimization; see `ex4_portfolio.ipynb`). 
 
 
 Our objective is to transform the form of the PLQ loss function $L_i(\cdot)$ in $(1)$ into the sum of a finite number of **rectified linear units (ReLU)** [2] and **rectified Huber units (ReHU)** [1] as follows. 
@@ -43,12 +43,11 @@ $$
 \begin{aligned}
 L_i(z)=\sum_{l=1}^L \text{ReLU}( u_{li} z + v_{li}) + \sum_{h=1}^H {\text{ReHU}}_ {\tau_{hi}}( s_{hi} z + t_{hi}), 
 \end{aligned}
-\tag{2} 
 $$
 
-where $u_{li},v_{li}$ and $s_{hi},t_{hi},\tau_{hi}$ are the ReLU-ReHU loss parameters for $L(\cdot)$, and the ReLU and ReHU functions are defined as
+where $u_{li},v_{li}$ and $s_{hi},t_{hi},\tau_{hi}$ are the ReLU-ReHU loss parameters for $L_i(\cdot)$, and the ReLU and ReHU functions are defined as
 
-$$\mathrm{ReLU}(z)=\max(z,0).$$ 
+$$\mathrm{ReLU}(z) = \max(z,0).$$ 
 
 
 and
@@ -57,9 +56,9 @@ and
 $$
 \mathrm{ReHU}_\tau(z) =
   \begin{cases}
-  \ 0,                     & \text{if } z \leq 0, \\
-  \ z^2/2,                 & \text{if } 0 < z \leq \tau, \\
-  \ \tau( z - \tau/2 ),   & \text{if } z > \tau.
+  0, & \text{if } z \leq 0, \\
+  z^2/2, & \text{if } 0 < z \leq \tau, \\
+  \tau( z - \tau/2 ), & \text{if } z > \tau.
   \end{cases}
 $$
 
@@ -81,12 +80,13 @@ $$
 \begin{aligned}
 L(z)=
 \begin{cases}
-\ a_1 z^2 + b_1 z + c_1, & \text{if } z \leq d_1, \\
-\ a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,3,...,m-1 \\
-\ a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
+a_1 z^2 + b_1 z + c_1, & \text{if } z \leq d_1, \\
+\qquad \cdots \\
+a_j z^2 + b_j z + c_j, & \text{if } d_{j-1} < z \leq d_{j}, \ j=2,...,m-1, \\
+\qquad \cdots \\
+a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
 \end{cases}
 \end{aligned}
-\tag{plq} 
 $$
 
 
@@ -95,9 +95,8 @@ $$
 
 $$
 \begin{aligned}
-L(z)=\max_{j=1,2,...,m} \lbrace a_{j} z^2 + b_{j} z + c_{j} \rbrace. \qquad
+L(z)= \max_{j=1,2,...m} \left( a_{j} z^2 + b_{j} z + c_{j} \right).
 \end{aligned}
-\tag{max} 
 $$
 
 
@@ -108,16 +107,17 @@ $$
 \begin{aligned}
 L(z)=
 \begin{cases}
-\ q_1  + \frac{q_{2} - q_{1}} { p_{2} - p_{1} } (z - p_{1}), & \text{if } z \leq p_1, \\
-\ q_{j-1} + \frac{q_{j} - q_{j-1}} { p_{j} - p_{j-1} } (z - p_{j-1}), \ & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
-\ q_{m-1} + \frac{q_{m-1} - q_{m}} { p_{m-1} - p_{m} } (z - p_{m}), & \text{if } z > p_{m},
+q_1 + \frac{q_{2} - q_{1}}{p_{2} - p_{1}} (z - p_{1}), & \text{if } z \leq p_1, \\
+\qquad \cdots \\
+q_{j-1} + \frac{q_{j} - q_{j-1}}{p_{j} - p_{j-1}} (z - p_{j-1}), & \text{if } p_{j-1} < z \leq p_{j}, \ j=2,...,m, \\
+\qquad \cdots \\
+q_{m} + \frac{q_{m} - q_{m-1}}{p_{m} - p_{m-1}} (z - p_{m}), & \text{if } z > p_{m},
 \end{cases}
 \end{aligned}
-\tag{points}
 $$
 
 
-where $\lbrace (p_1,q_1),\ (p_2,q_2),\ ...,\ (p_m, q_m) \rbrace$ are a series of given points and $m\geq 2$. The **points** representation can only express piecewise linear functions.
+where $\lbrace (p_1,q_1), (p_2,q_2), ..., (p_m, q_m) \rbrace$ are a series of given points and $m\geq 2$. The **points** representation can only express piecewise linear functions.
 
 **Create a PLQ Loss**  
 ```python
@@ -153,7 +153,7 @@ where $C_i>0$ is the sample weight for the $i$-th instance, and $p_i$ and $q_i$ 
 
 
 $$
-  L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
+  L_{i} ( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta});
 $$
   
   
@@ -161,7 +161,7 @@ $$
 
 
 $$
-  L_{i} ( \mathbf{x}_ {i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
+  L_{i} ( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta} ) = C_{i} L(y_i - \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta}).
 $$
   
   
