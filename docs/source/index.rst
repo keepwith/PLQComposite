@@ -201,6 +201,10 @@ Utilize the **affine_transformation** method to broadcast by providing
 ‘regression’ or ‘classification’. You should be careful when directly
 specifying these forms.
 
+For **rehline** :math:`\geq` 0.1.0, pass the regularization strength via
+``ReHLine(C=C)`` only; use ``c=1`` in ``affine_transformation`` to avoid
+applying :math:`C` twice.
+
 If the specific relationship does not apply to your task, you may
 manually repeat stage 1 and 2. Then, combine all the rehloss together
 and use **rehline** to address the problem.
@@ -208,10 +212,10 @@ and use **rehline** to address the problem.
 .. code:: python
 
    from plqcom import affine_transformation
-   # specify p and q
-   rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, p=y, q=0)
+   # specify p and q (c=1; C is set on ReHLine below)
+   rehloss = affine_transformation(rehloss, n=X.shape[0], c=1, p=y, q=0)
    # form = 'classification'
-   rehloss = affine_transformation(rehloss, n=X.shape[0], c=C, form='classification')
+   rehloss = affine_transformation(rehloss, n=X.shape[0], c=1, form='classification', y=y)
 
 4) Use Rehline solve the problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,8 +223,8 @@ and use **rehline** to address the problem.
 .. code:: python
 
    from rehline import ReHLine
-   clf = ReHLine(loss={'name': 'custom'}, C=C)
-   clf.U, clf.V, clf.Tau, clf.S, clf.T= rehloss.relu_coef, rehloss.relu_intercept,rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
+   clf = ReHLine(C=C)
+   clf._U, clf._V, clf._Tau, clf._S, clf._T = rehloss.relu_coef, rehloss.relu_intercept, rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
    clf.fit(X=X)
    print('sol provided by rehline: %s' % clf.coef_)
 

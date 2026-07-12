@@ -1,5 +1,5 @@
 numpy
-rehline
+rehline>=0.1.0
 scipy
 pybind11
 matplotlib

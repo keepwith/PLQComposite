@@ -19,7 +19,7 @@ and install them with the command below.
   pip install -r requirements.txt
 
 | For install and build:
-|     [numpy, rehline, scipy, pybind11]
+|     [numpy, rehline>=0.1.0, scipy, pybind11]
 
 | For example and tests:
 |     [matplotlib]
