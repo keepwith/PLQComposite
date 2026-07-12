@@ -22,7 +22,7 @@ Contents
 
 -  `Introduction <#Introduction>`__
 -  `Usage <#Usage>`__
--  `Examples and Notebooks <#Examples-and-Notebooks>`__
+-  `Examples and Notebooks <#Examples-and-Notebooks>`__ (see also :doc:`examples`)
 -  `Citation <#Citation>`__
 -  `References <#References>`__
 
@@ -89,7 +89,7 @@ package to solve the ERM problem.
 Usage
 -----
 
-In general, to solve the ERM problem using **plqcom** and **reline**,
+In general, to solve the ERM problem using **plqcom** and **rehline**,
 follow the four steps outlined below. For specific details about these
 functions, please refer to the API documentation.
 
@@ -202,9 +202,19 @@ Utilize the **affine_transformation** method to broadcast by providing
 ‘regression’ or ‘classification’. You should be careful when directly
 specifying these forms.
 
-For **rehline** :math:`\geq` 0.1.0, pass the regularization strength via
-``ReHLine(C=C)`` only; use ``c=1`` in ``affine_transformation`` to avoid
-applying :math:`C` twice.
+**Do not confuse ``c`` and ``C`` in code** (related to, but not identical to,
+mathematical :math:`C_i` above):
+
+- ``c`` in ``affine_transformation(..., c=...)`` (plqcom): per-sample scale on
+  the prototype loss. Use ``c=1`` for uniform weights; use ``c \neq 1`` only for
+  heterogeneous sample weights :math:`C_i`.
+- ``C`` in ``ReHLine(C=...)`` / ``plq_Ridge_*(C=...)`` (rehline): global ERM
+  weight / inverse regularization — the main tuning knob.
+
+For **rehline** :math:`\geq` 0.1.0, set ERM strength via ``ReHLine(C=...)`` only;
+use ``c=1`` in ``affine_transformation`` unless you need per-sample weights.
+**Do not** pass ``c=C`` when you also set ``ReHLine(C=C)`` — ReHLine applies
+``C`` internally and the penalty would be doubled.
 
 If the specific relationship does not apply to your task, you may
 manually repeat stage 1 and 2. Then, combine all the rehloss together
@@ -231,6 +241,8 @@ Pass the decomposed parameters to ``ReHLine`` and call ``fit(X)``:
 
 .. code:: python
 
+   # C: ReHLine ERM weight (ex1/ex2 use 0.5; ex3 uses 1.0; ex4 uses 0.5)
+   C = 0.5
    from rehline import ReHLine
    clf = ReHLine(C=C)
    clf._U, clf._V, clf._Tau, clf._S, clf._T = (
@@ -252,14 +264,17 @@ MAE, ...), use ``plq_Ridge_Classifier`` or ``plq_Ridge_Regressor`` with
 
 .. code:: python
 
-   # Classification (e.g. SVM)
+   # C: inverse regularization strength in ReHLine (tune per problem; see notebooks)
+   C = 1.0
+
+   # Classification (e.g. SVM; ex2_svm.ipynb uses C=0.5)
    from rehline import plq_Ridge_Classifier
    clf = plq_Ridge_Classifier(loss={'name': 'svm'}, C=C)
    clf.fit(X, y)
 
-   # Regression (e.g. ridge / MSE)
+   # Regression (e.g. ridge / MSE; ex3_regression.ipynb uses C=1)
    from rehline import plq_Ridge_Regressor
-   clf = plq_Ridge_Regressor(loss={'name': 'MSE'}, C=1)
+   clf = plq_Ridge_Regressor(loss={'name': 'MSE'}, C=C)
    clf.fit(X, y)
 
    print(clf.coef_, clf.intercept_)
@@ -270,13 +285,22 @@ documentation for the full list of built-in loss names.
 Examples and Notebooks
 ----------------------
 
--  `Hinge and Square
-   loss <https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing>`__
--  `Portfolio
-   Optimization <https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing>`__
--  `SVM <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__
--  `Ridge
-   Regression <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__
+All runnable notebooks are collected on the :doc:`examples` page (sidebar:
+**Examples**). Source files live in ``examples/`` and are mirrored under
+``docs/source/notebooks/`` for Sphinx.
+
+-  :doc:`ex1: Hinge–Square <notebooks/ex1_hinge_square>`
+   — custom composite classification; low-level ``ReHLine`` API only
+   (`Colab mirror <https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing>`__)
+-  :doc:`ex2: SVM <notebooks/ex2_svm>`
+   — plqcom decomposition and ``plq_Ridge_Classifier``
+   (`GitHub mirror <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__)
+-  :doc:`ex3: Ridge Regression <notebooks/ex3_regression>`
+   — plqcom decomposition and ``plq_Ridge_Regressor``
+   (`GitHub mirror <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__)
+-  :doc:`ex4: Portfolio <notebooks/ex4_portfolio>`
+   — PLQ from points with linear constraints (``_A``, ``_b``)
+   (`Colab mirror <https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing>`__)
 
 Citation
 --------

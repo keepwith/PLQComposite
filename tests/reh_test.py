@@ -241,6 +241,47 @@ class TestReHLineIntegration(unittest.TestCase):
             clf_sklearn.coef_, clf_plqcom.coef_, rtol=1e-5, atol=1e-5
         )
 
+    def test_affine_c_equals_rehline_C_doubles_penalty(self):
+        """Passing c=C in affine_transformation while ReHLine(C=C) is wrong."""
+        X, y = _classification_data()
+        C = 0.5
+        n = X.shape[0]
+
+        plqloss = PLQLoss(
+            quad_coef={
+                "a": np.array([0.0, 0.0]),
+                "b": np.array([0.0, 1.0]),
+                "c": np.array([0.0, 0.0]),
+            },
+            cutpoints=np.array([0]),
+        )
+        rehloss_correct = plq_to_rehloss(plqloss)
+        rehloss_correct = affine_transformation(
+            rehloss_correct, n=n, c=1, p=-y, q=1
+        )
+        clf_correct = ReHLine(C=C)
+        clf_correct._U, clf_correct._V = (
+            rehloss_correct.relu_coef,
+            rehloss_correct.relu_intercept,
+        )
+        clf_correct.fit(X=X)
+
+        rehloss_wrong = plq_to_rehloss(plqloss)
+        rehloss_wrong = affine_transformation(
+            rehloss_wrong, n=n, c=C, p=-y, q=1
+        )
+        clf_wrong = ReHLine(C=C)
+        clf_wrong._U, clf_wrong._V = (
+            rehloss_wrong.relu_coef,
+            rehloss_wrong.relu_intercept,
+        )
+        clf_wrong.fit(X=X)
+
+        with self.assertRaises(AssertionError):
+            np.testing.assert_allclose(
+                clf_wrong.coef_, clf_correct.coef_, rtol=1e-5, atol=1e-5
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

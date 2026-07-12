@@ -166,7 +166,14 @@ $$
 
 Utilize the **affine_transformation** method to broadcast by providing $p_i$ and $q_i$, or by simply indicating the input form as 'regression' or 'classification'. You should be careful when directly specifying these forms.
 
-For **rehline** $\geq$ 0.1.0, pass the regularization strength via `ReHLine(C=C)` only; use `c=1` in `affine_transformation` to avoid applying $C$ twice.
+**Do not confuse `c` and `C` in code** (they are related to, but not the same as, the mathematical $C_i$ above):
+
+| Symbol | Where | Role |
+|--------|-------|------|
+| `c` in `affine_transformation(..., c=...)` | plqcom | Per-sample scale on the **prototype** loss after decomposition. Use `c=1` for uniform weighting. Use `c != 1` only for heterogeneous sample weights $C_i$. |
+| `C` in `ReHLine(C=...)` / `plq_Ridge_*(C=...)` | rehline | Global ERM weight / inverse regularization strength — the main tuning knob for loss vs ridge penalty. |
+
+For **rehline** $\geq$ 0.1.0, set ERM strength via `ReHLine(C=...)` (or sklearn `C=...`) only; use `c=1` in `affine_transformation` unless you need per-sample weights. **Do not** pass `c=C` when you also set `ReHLine(C=C)` — ReHLine applies `C` internally and the penalty would be doubled.
 
 If the specific relationship does not apply to your task, you may manually repeat stage 1 and 2. Then, combine all the rehloss together and use **rehline** to address the problem.  
 
@@ -187,6 +194,8 @@ ReHLine $\geq$ 0.1.0 supports two calling styles:
 Use this when the loss is a **custom** PLQ composite from plqcom (steps 1–3). Pass the decomposed parameters to `ReHLine` and call `fit(X)`:
 
 ```python
+# C: ReHLine ERM weight (ex1/ex2 use 0.5; ex3 uses 1.0; ex4 uses 0.5)
+C = 0.5
 from rehline import ReHLine
 clf = ReHLine(C=C)
 clf._U, clf._V, clf._Tau, clf._S, clf._T = (
@@ -204,14 +213,17 @@ For problems with linear constraints (e.g. portfolio), also set `clf._A` and `cl
 For **standard** PLQ losses already built into ReHLine (SVM, hinge, Huber, MSE, MAE, ...), use `plq_Ridge_Classifier` or `plq_Ridge_Regressor` with `fit(X, y)` — no plqcom decomposition needed:
 
 ```python
-# Classification (e.g. SVM)
+# C: inverse regularization strength in ReHLine (tune per problem; see notebooks)
+C = 1.0
+
+# Classification (e.g. SVM; ex2_svm.ipynb uses C=0.5)
 from rehline import plq_Ridge_Classifier
 clf = plq_Ridge_Classifier(loss={'name': 'svm'}, C=C)
 clf.fit(X, y)
 
-# Regression (e.g. ridge / MSE)
+# Regression (e.g. ridge / MSE; ex3_regression.ipynb uses C=1)
 from rehline import plq_Ridge_Regressor
-clf = plq_Ridge_Regressor(loss={'name': 'MSE'}, C=1)
+clf = plq_Ridge_Regressor(loss={'name': 'MSE'}, C=C)
 clf.fit(X, y)
 
 print(clf.coef_, clf.intercept_)
@@ -223,10 +235,15 @@ See the [ReHLine-python](https://github.com/softmin/ReHLine-python) documentatio
 
 
 ## Examples and Notebooks
-- [Hinge and Square loss](https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing)
-- [Portfolio Optimization](https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing)
-- [SVM](https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb)
-- [Ridge Regression](https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb)
+
+| Notebook | Description |
+|----------|-------------|
+| [ex1: Hinge–Square](https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing) | Custom composite classification loss; low-level `ReHLine` API only |
+| [ex2: SVM](https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb) | Hinge SVM via plqcom decomposition **and** `plq_Ridge_Classifier` |
+| [ex3: Ridge Regression](https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb) | MSE / ridge via plqcom **and** `plq_Ridge_Regressor` |
+| [ex4: Portfolio](https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing) | PLQ from points + linear constraints (`_A`, `_b`) |
+
+Source notebooks live in `examples/` and are mirrored under `docs/source/notebooks/` for Sphinx.
 
 
 

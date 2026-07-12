@@ -18,7 +18,12 @@ def affine_transformation(rehloss: ReHLoss, n=1, c=1, p=1, q=0, form="custom", y
          A ReHLoss object
 
     c: a number or {array_like} of shape (n_samples,), default=1
-        scale parameter on loss function and require c > 0
+        Per-sample scale on the prototype loss (mathematical :math:`C_i` in
+        :math:`L_i(z) = C_i L(p_i z + q_i)`). Use ``c=1`` for uniform weights.
+        This is **not** the same as ``C`` in ``ReHLine(C=...)``: for rehline
+        >= 0.1.0, set global ERM strength via ``ReHLine(C=...)`` only and keep
+        ``c=1`` here unless you need heterogeneous sample weights. Do not pass
+        ``c=C`` when also using ``ReHLine(C=C)`` — that applies the penalty twice.
 
     p: a number or {array_like} of shape (n_samples,),default=1
         scale parameter on z
