@@ -6,6 +6,9 @@
 Welcome to PLQ Composite Decomposition's documentation!
 =======================================================
 
+**Paper**: `ReLU-ReHU Representations of Piecewise Linear-Quadratic Losses <https://jds-online.org/journal/JDS/article/1401/info>`__
+(*Journal of Data Science*, Vol. 23, No. 4, pp. 648–658, 2025;
+`DOI <https://doi.org/10.6339/24-JDS1162>`__: 10.6339/24-JDS1162)
 
 -  Github Repo: https://github.com/keepwith/PLQComposite
 -  Documentation: https://plqcomposite.readthedocs.io
@@ -13,8 +16,6 @@ Welcome to PLQ Composite Decomposition's documentation!
    license <https://opensource.org/licenses/MIT>`__
 -  Download Repo:
    ``$ git clone https://github.com/keepwith/PLQComposite.git``
--  Technical Details:
-   `technical_details.pdf <https://github.com/keepwith/PLQComposite/blob/main/docs/technical_details.pdf>`__
 
 Contents
 --------
@@ -22,6 +23,7 @@ Contents
 -  `Introduction <#Introduction>`__
 -  `Usage <#Usage>`__
 -  `Examples and Notebooks <#Examples-and-Notebooks>`__
+-  `Citation <#Citation>`__
 -  `References <#References>`__
 
 Introduction
@@ -220,18 +222,37 @@ and use **rehline** to address the problem.
    clf = ReHLine(loss={'name': 'custom'}, C=C)
    clf.U, clf.V, clf.Tau, clf.S, clf.T= rehloss.relu_coef, rehloss.relu_intercept,rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
    clf.fit(X=X)
-   print('sol privided by rehline: %s' % clf.coef_)
+   print('sol provided by rehline: %s' % clf.coef_)
 
 Examples and Notebooks
 ----------------------
 
 -  `Hinge and Square
    loss <https://colab.research.google.com/drive/1VKsSci1DqkHt7wJgruYRN3dp1EHO87SU?usp=sharing>`__
--  `Portfilio
+-  `Portfolio
    Optimization <https://colab.research.google.com/drive/1k2ZVk9FmtnPklA1MQpQg2-JqDbwR9RHu?usp=sharing>`__
 -  `SVM <https://github.com/keepwith/PLQComposite/blob/main/examples/ex2_svm.ipynb>`__
 -  `Ridge
    Regression <https://github.com/keepwith/PLQComposite/blob/main/examples/ex3_regression.ipynb>`__
+
+Citation
+--------
+
+If you use **plqcom** in your research, please cite our paper:
+
+.. code-block:: bibtex
+
+   @article{GaoDaiQiu2025,
+     title   = {ReLU-ReHU Representations of Piecewise Linear-Quadratic Losses},
+     author  = {Gao, Tingxian and Dai, Ben and Qiu, Yixuan},
+     journal = {Journal of Data Science},
+     volume  = {23},
+     number  = {4},
+     pages   = {648--658},
+     year    = {2025},
+     doi     = {10.6339/24-JDS1162},
+     url     = {https://jds-online.org/journal/JDS/article/1401/info}
+   }
 
 References
 ----------
@@ -253,7 +274,6 @@ Indices and tables
     :maxdepth: 1
 
     installation
-    technical details
     examples
 
 

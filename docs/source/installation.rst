@@ -1,6 +1,13 @@
 Installation
 ============
 
+Published paper
+---------------
+
+The accompanying article is available in *Journal of Data Science* (2025):
+`ReLU-ReHU Representations of Piecewise Linear-Quadratic Losses <https://jds-online.org/journal/JDS/article/1401/info>`__
+(`DOI <https://doi.org/10.6339/24-JDS1162>`__: 10.6339/24-JDS1162).
+
 Dependencies
 ------------
 

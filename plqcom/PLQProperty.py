@@ -150,7 +150,7 @@ def find_min(plq_loss):
 
 def plq_to_rehloss(plq_loss):
     """convert the PLQLoss function to a ReHLoss function piece by piece.
-        The details are described in the technical details.
+        See Gao, Dai & Qiu (2025), Journal of Data Science, doi:10.6339/24-JDS1162.
 
     Parameters
     ----------

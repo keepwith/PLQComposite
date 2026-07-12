@@ -11,14 +11,14 @@ import itertools
 
 class PLQLoss(object):
     """
-    PLQLoss is a class represents a continuous convex piecewise quandratic loss function, which adopts three types of
+    PLQLoss is a class represents a continuous convex piecewise quadratic loss function, which adopts three types of
     input forms: 'plq', 'max' and 'points'.
 
     Parameters
     ----------
 
     quad_coef : {dict-like} of {'a': [], 'b': [], 'c': []}
-        The quandratic coefficients in pieces of the PLQLoss.
+        The quadratic coefficients in pieces of the PLQLoss.
         The i-th piece Q is: a[i]* x**2 + b[i] * x + c[i]
 
     form : str, optional, default: 'plq'

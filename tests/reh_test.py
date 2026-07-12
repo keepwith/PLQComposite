@@ -19,7 +19,7 @@ def svm_test():
     clf_1 = plqERM_Ridge(loss={'name': 'svm'})
     clf_1.C = C
     clf_1.fit(X=X, y=y)
-    print('sol privided by rehline: %s' % clf_1.coef_)
+    print('sol provided by rehline: %s' % clf_1.coef_)
     print(clf_1.decision_function([[.1, .2, .3]]))
 
     # Usage 2: manually specify params
@@ -30,7 +30,7 @@ def svm_test():
     clf_2 = ReHLine()
     clf_2.U, clf_2.V, clf_2.C = U, V, C
     clf_2.fit(X=X)
-    print('sol privided by rehline: %s' % clf_2.coef_)
+    print('sol provided by rehline: %s' % clf_2.coef_)
     print(clf_2.decision_function([[.1, .2, .3]]))
 
     # Usage 3: manually specify params by PLQComposition Decomposition
@@ -42,7 +42,7 @@ def svm_test():
     clf_3 = ReHLine()
     clf_3.U, clf_3.V, clf_3.C = rehloss.relu_coef, rehloss.relu_intercept, C
     clf_3.fit(X=X)
-    print('sol privided by rehline with form custom: %s' % clf_3.coef_)
+    print('sol provided by rehline with form custom: %s' % clf_3.coef_)
     print(clf_3.decision_function([[.1, .2, .3]]))
 
     print(np.array_equal(clf_1.U, clf_3.U))
@@ -56,7 +56,7 @@ def svm_test():
     clf_4 = ReHLine()
     clf_4.U, clf_4.V, clf_4.C = rehloss.relu_coef, rehloss.relu_intercept, C
     clf_4.fit(X=X)
-    print('sol privided by rehline with form affine: %s' % clf_4.coef_)
+    print('sol provided by rehline with form affine: %s' % clf_4.coef_)
     print(clf_4.decision_function([[.1, .2, .3]]))
 
     print(np.array_equal(clf_1.U, clf_3.U))
@@ -77,7 +77,7 @@ def ssvm_test():
     # Usage 1: build-in loss
     clf_1 =plqERM_Ridge(loss={'name': 'sSVM'}, C=C)
     clf_1.fit(X=X, y=y)
-    print('sol privided by rehline: %s' % clf_1.coef_)
+    print('sol provided by rehline: %s' % clf_1.coef_)
     print(clf_1.decision_function([[.1, .2, .3]]))
 
     # Usage 2: manually specify params
@@ -89,7 +89,7 @@ def ssvm_test():
     clf_2 = ReHLine()
     clf_2.S, clf_2.T, clf_2.Tau, clf_2.C = S, T, Tau, C
     clf_2.fit(X=X)
-    print('sol privided by rehline: %s' % clf_2.coef_)
+    print('sol provided by rehline: %s' % clf_2.coef_)
     print(clf_2.decision_function([[.1, .2, .3]]))
 
     # Usage 3: manually specify params by PLQComposition Decomposition
@@ -102,7 +102,7 @@ def ssvm_test():
     clf_3 = ReHLine()
     clf_3.S, clf_3.T, clf_3.Tau, clf_3.C = rehloss.rehu_coef, rehloss.rehu_intercept, rehloss.rehu_cut, C
     clf_3.fit(X=X)
-    print('sol privided by rehline: %s' % clf_3.coef_)
+    print('sol provided by rehline: %s' % clf_3.coef_)
     print(clf_3.decision_function([[.1, .2, .3]]))
 
     print(np.array_equal(clf_1.S, clf_3.S))
@@ -125,12 +125,12 @@ def ridge_regression_test():
     clf_1 = ReHLine()
     clf_1.Tau, clf_1.S, clf_1.T, clf_1.C = rehloss_1.rehu_cut, rehloss_1.rehu_coef, rehloss_1.rehu_intercept, 1.0
     clf_1.fit(X=X)
-    print('sol privided by rehline: %s' % clf_1.coef_)
+    print('sol provided by rehline: %s' % clf_1.coef_)
 
     clf_2 = ReHLine()
     clf_2.Tau, clf_2.S, clf_2.T, clf_2.C = rehloss_2.rehu_cut, rehloss_2.rehu_coef, rehloss_2.rehu_intercept, 1.0
     clf_2.fit(X=X)
-    print('sol privided by rehline: %s' % clf_2.coef_)
+    print('sol provided by rehline: %s' % clf_2.coef_)
     print(np.array_equal(clf_1.Tau, clf_2.Tau))
     print(np.array_equal(clf_1.S, clf_2.S))
     print(np.array_equal(clf_1.T, clf_2.T))
