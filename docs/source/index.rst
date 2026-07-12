@@ -217,16 +217,54 @@ and use **rehline** to address the problem.
    # form = 'classification'
    rehloss = affine_transformation(rehloss, n=X.shape[0], c=1, form='classification', y=y)
 
-4) Use Rehline solve the problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4) Solve with ReHLine
+~~~~~~~~~~~~~~~~~~~~~
+
+ReHLine :math:`\geq` 0.1.0 supports two calling styles:
+
+4a) Low-level API (after plqcom decomposition)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use this when the loss is a **custom** PLQ composite from plqcom (steps 1–3).
+Pass the decomposed parameters to ``ReHLine`` and call ``fit(X)``:
 
 .. code:: python
 
    from rehline import ReHLine
    clf = ReHLine(C=C)
-   clf._U, clf._V, clf._Tau, clf._S, clf._T = rehloss.relu_coef, rehloss.relu_intercept, rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept
+   clf._U, clf._V, clf._Tau, clf._S, clf._T = (
+       rehloss.relu_coef, rehloss.relu_intercept,
+       rehloss.rehu_cut, rehloss.rehu_coef, rehloss.rehu_intercept,
+   )
    clf.fit(X=X)
    print('sol provided by rehline: %s' % clf.coef_)
+
+For problems with linear constraints (e.g. portfolio), also set ``clf._A`` and
+``clf._b``.
+
+4b) Scikit-learn style API (built-in losses)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For **standard** PLQ losses already built into ReHLine (SVM, hinge, Huber, MSE,
+MAE, ...), use ``plq_Ridge_Classifier`` or ``plq_Ridge_Regressor`` with
+``fit(X, y)`` — no plqcom decomposition needed:
+
+.. code:: python
+
+   # Classification (e.g. SVM)
+   from rehline import plq_Ridge_Classifier
+   clf = plq_Ridge_Classifier(loss={'name': 'svm'}, C=C)
+   clf.fit(X, y)
+
+   # Regression (e.g. ridge / MSE)
+   from rehline import plq_Ridge_Regressor
+   clf = plq_Ridge_Regressor(loss={'name': 'MSE'}, C=1)
+   clf.fit(X, y)
+
+   print(clf.coef_, clf.intercept_)
+
+See the `ReHLine-python <https://github.com/softmin/ReHLine-python>`__
+documentation for the full list of built-in loss names.
 
 Examples and Notebooks
 ----------------------
