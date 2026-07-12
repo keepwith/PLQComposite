@@ -113,7 +113,6 @@ are enumerated as follows.
    \ a_m z^2 + b_m z + c_m, & \text{if } z > d_{m-1}.
    \end{cases}
    \end{aligned}
-   \tag{plq}
 
 **max**: specifying the coefficients of a series of quadratic functions
 and taking the pointwise maximum of each function.
@@ -140,7 +139,6 @@ given points.
    \ q_{m} + \frac{q_{m} - q_{m-1}} { p_{m} - p_{m-1} } (z - p_{m}), & \text{if } z > p_{m},
    \end{cases}
    \end{aligned}
-   \tag{points}
 
 where :math:`\lbrace (p_1,q_1), (p_2,q_2), ..., (p_m, q_m) \rbrace`
 are a series of given points and :math:`m\geq 2`. The **points**

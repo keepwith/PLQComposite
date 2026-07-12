@@ -26,10 +26,7 @@
 **Empirical Risk Minimization (ERM)**[3] is a fundamental framework that provides a general methodology for addressing a wide variety of machine learning tasks. In many machine learning ERM problems, loss functions can be represented as **piecewise linear-quadratic (PLQ)** functions. Specifically, the formulation given a PLQ loss function $L_i(\cdot): \mathbb{R} \rightarrow \mathbb{R}^{+}_{0}$ is as follows:
 
 $$
-\begin{aligned}
-\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n  L_i( \mathbf{x}_{i}^{\intercal} \boldsymbol{\beta})
-+ \frac{1}{2} \Vert \boldsymbol{\beta} \Vert_2^2, \qquad \text{ s.t. } \mathbf{A} \boldsymbol{\beta} + \mathbf{b} \geq \mathbf{0},
-\end{aligned}
+\min_{\boldsymbol{\beta} \in \mathbb{R}^d} \sum_{i=1}^n L_i\left(\mathbf{x}_{i}^{\intercal}\boldsymbol{\beta}\right) + \frac{1}{2}\Vert\boldsymbol{\beta}\Vert_2^2, \qquad \text{s.t.}\quad \mathbf{A}\boldsymbol{\beta}+\mathbf{b}\geq\mathbf{0}.
 $$
 
 
